@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Duo Dash 🐱🐶</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:#1a1a2e;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;overflow:hidden;user-select:none;
+}
+#shell{
+  position:relative;
+  width:900px;height:560px;
+  background:#fff;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 4px rgba(255,255,255,.08);
+}
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  transition:opacity .35s,transform .35s;
+  z-index:20;
+}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(.97);}
+
+/* TITLE */
+#sTitle{background:linear-gradient(160deg,#ffecd2 0%,#fcb69f 40%,#a1c4fd 100%);}
+.tbub{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.tb{position:absolute;border-radius:50%;opacity:.2;animation:tbF linear infinite;}
+@keyframes tbF{from{transform:translateY(620px) scale(.6);}to{transform:translateY(-120px) scale(1.1);}}
+.title-box{
+  background:rgba(255,255,255,.9);backdrop-filter:blur(8px);
+  border-radius:28px;padding:34px 50px;text-align:center;
+  box-shadow:0 16px 48px rgba(0,0,0,.13);position:relative;z-index:1;width:500px;
+}
+.logo{
+  font-family:'Fredoka One',cursive;font-size:66px;line-height:1;
+  background:linear-gradient(135deg,#FF6B6B,#FFD166,#4ECDC4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.06));
+}
+.logo-sub{font-size:11px;font-weight:800;letter-spacing:3px;color:#bbb;text-transform:uppercase;margin-bottom:20px;}
+.char-row{display:flex;gap:20px;justify-content:center;margin-bottom:20px;}
+.char-card{
+  background:#f9f9f9;border-radius:16px;padding:12px 18px;
+  text-align:center;border:3px solid transparent;width:115px;
+}
+.char-card.c1{border-color:#FF6B6B;} .char-card.c2{border-color:#4ECDC4;}
+.char-av{font-size:34px;margin-bottom:4px;}
+.char-nm{font-size:12px;font-weight:900;margin-bottom:2px;}
+.c1 .char-nm{color:#FF6B6B;} .c2 .char-nm{color:#4ECDC4;}
+.char-ctrl{font-size:11px;color:#aaa;font-weight:700;}
+.btn-row{display:flex;gap:10px;justify-content:center;}
+.btn{border:none;border-radius:50px;cursor:pointer;font-family:'Fredoka One',cursive;
+  font-size:17px;padding:11px 28px;transition:transform .1s,box-shadow .1s;}
+.btn:hover{transform:translateY(-2px);} .btn:active{transform:translateY(1px);}
+.btn-s{background:linear-gradient(135deg,#FF6B6B,#FF8E53);color:#fff;
+  box-shadow:0 5px 0 rgba(180,60,60,.4);}
+.btn-h{background:linear-gradient(135deg,#4ECDC4,#45B7D1);color:#fff;
+  box-shadow:0 5px 0 rgba(40,140,160,.4);}
+
+/* HOW TO */
+#sHowto{background:linear-gradient(160deg,#e0f7fa 0%,#fff9f0 100%);}
+.howto-box{
+  background:rgba(255,255,255,.95);border-radius:28px;padding:30px 42px;
+  width:720px;box-shadow:0 16px 48px rgba(0,0,0,.1);
+}
+.howto-title{font-family:'Fredoka One',cursive;font-size:30px;color:#2D3047;text-align:center;margin-bottom:8px;}
+.story-box{
+  background:linear-gradient(135deg,#fff9f0,#fff0f8);
+  border-radius:14px;padding:14px 18px;margin-bottom:16px;border-left:5px solid #FFD166;
+}
+.story-text{font-size:13px;font-weight:600;color:#555;line-height:1.7;}
+.story-text strong{color:#FF6B6B;}
+.ctrl-row{display:flex;gap:14px;margin-bottom:16px;}
+.ctrl-card{
+  flex:1;background:#f8f8f8;border-radius:14px;padding:14px;text-align:center;
+  border:2.5px solid transparent;
+}
+.ctrl-card.c1{border-color:#FF6B6B;} .ctrl-card.c2{border-color:#4ECDC4;}
+.ctrl-av{font-size:28px;margin-bottom:4px;}
+.ctrl-pl{font-size:12px;font-weight:900;margin-bottom:8px;}
+.c1 .ctrl-pl{color:#FF6B6B;} .c2 .ctrl-pl{color:#4ECDC4;}
+.ctrl-keys{display:flex;flex-direction:column;gap:5px;align-items:center;}
+.key-row{display:flex;gap:4px;align-items:center;}
+.key{background:#fff;border:2px solid #ddd;border-radius:7px;width:30px;height:30px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#444;box-shadow:0 3px 0 #ccc;}
+.key-lbl{font-size:10px;color:#aaa;font-weight:700;margin-left:5px;}
+.btn-pn{display:block;width:100%;background:linear-gradient(135deg,#FF6B6B,#FF8E53);color:#fff;
+  border:none;border-radius:50px;padding:13px;font-family:'Fredoka One',cursive;font-size:20px;
+  cursor:pointer;box-shadow:0 5px 0 rgba(180,60,60,.4);transition:transform .1s;}
+.btn-pn:hover{transform:translateY(-2px);}
+.btn-bk{display:block;margin-top:8px;background:none;border:none;font-size:12px;
+  font-weight:700;color:#bbb;cursor:pointer;font-family:'Nunito',sans-serif;}
+.btn-bk:hover{color:#888;}
+
+/* HUD */
+#hud{
+  position:absolute;top:0;left:0;right:0;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;z-index:15;
+  background:rgba(255,255,255,.97);border-bottom:3px solid #f0f0f0;
+  box-shadow:0 2px 8px rgba(0,0,0,.07);
+}
+.hud-p{display:flex;align-items:center;gap:8px;background:#f5f5f5;
+  border-radius:12px;padding:5px 12px;border:2.5px solid transparent;}
+.hud-p.h1{border-color:#FF6B6B;} .hud-p.h2{border-color:#4ECDC4;}
+.hud-av{font-size:20px;} .hud-info{line-height:1.2;}
+.hud-pnm{font-size:12px;font-weight:900;}
+.h1 .hud-pnm{color:#FF6B6B;} .h2 .hud-pnm{color:#4ECDC4;}
+.hud-kl{font-size:10px;color:#bbb;font-weight:700;}
+.hud-c{text-align:center;}
+.hud-lv{font-family:'Fredoka One',cursive;font-size:16px;color:#2D3047;line-height:1;}
+.hud-ln{font-size:10px;color:#bbb;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+
+/* CANVAS */
+#gameCanvas{position:absolute;top:52px;left:0;width:900px;height:508px;display:block;}
+
+/* TOAST */
+#toast{
+  position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+  background:rgba(30,30,50,.9);color:#fff;border-radius:14px;padding:9px 20px;
+  font-size:12.5px;font-weight:700;z-index:30;pointer-events:none;
+  transition:opacity .6s;text-align:center;max-width:680px;
+  backdrop-filter:blur(4px);white-space:nowrap;
+}
+#toast.gone{opacity:0;}
+
+/* LEVEL COMPLETE */
+#sComplete{background:rgba(0,0,0,.45);backdrop-filter:blur(6px);}
+.cc{background:#fff;border-radius:26px;padding:40px 60px;text-align:center;
+  box-shadow:0 24px 64px rgba(0,0,0,.22);animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.cc-em{font-size:60px;margin-bottom:8px;}
+.cc-ti{font-family:'Fredoka One',cursive;font-size:38px;color:#2D3047;margin-bottom:6px;}
+.cc-su{font-size:14px;font-weight:700;color:#aaa;margin-bottom:22px;}
+.btn-nx{background:linear-gradient(135deg,#6BCB77,#4DA35C);color:#fff;border:none;
+  border-radius:50px;padding:12px 42px;font-family:'Fredoka One',cursive;font-size:20px;
+  cursor:pointer;box-shadow:0 5px 0 rgba(50,130,60,.4);transition:transform .1s;}
+.btn-nx:hover{transform:translateY(-2px);}
+
+/* WIN */
+#sWin{background:linear-gradient(160deg,#ffecd2,#a1c4fd);}
+.win-card{background:#fff;border-radius:30px;padding:50px 70px;text-align:center;
+  box-shadow:0 24px 64px rgba(0,0,0,.14);animation:popIn .5s cubic-bezier(.34,1.56,.64,1);}
+.win-em{font-size:70px;margin-bottom:10px;}
+.win-ti{font-family:'Fredoka One',cursive;font-size:50px;
+  background:linear-gradient(135deg,#FF6B6B,#4ECDC4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.win-su{font-size:15px;font-weight:700;color:#aaa;margin:8px 0 22px;}
+.btn-rp{background:linear-gradient(135deg,#FF6B6B,#4ECDC4);color:#fff;border:none;
+  border-radius:50px;padding:13px 50px;font-family:'Fredoka One',cursive;font-size:21px;
+  cursor:pointer;box-shadow:0 5px 0 rgba(100,100,200,.3);transition:transform .1s;}
+.btn-rp:hover{transform:translateY(-2px);}
+
+/* CONFETTI */
+.conf{position:fixed;pointer-events:none;animation:cF 1.4s ease-in forwards;z-index:999;}
+@keyframes cF{0%{transform:translateY(-30px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(640px) rotate(540deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- TITLE -->
+<div class="screen" id="sTitle">
+  <div class="tbub" id="titleBub"></div>
+  <div class="title-box">
+    <div class="logo">Duo Dash</div>
+    <div class="logo-sub">A Co-op Adventure</div>
+    <div class="char-row">
+      <div class="char-card c1"><div class="char-av">🐱</div><div class="char-nm">MOCHI</div><div class="char-ctrl">W / A / D</div></div>
+      <div class="char-card c2"><div class="char-av">🐶</div><div class="char-nm">BISCUIT</div><div class="char-ctrl">↑ / ← / →</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-h" id="btnH">📖 Story</button>
+      <button class="btn btn-s" id="btnSt">Play! 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOW TO PLAY -->
+<div class="screen hidden" id="sHowto">
+  <div class="howto-box">
+    <div class="howto-title">📖 The Story</div>
+    <div class="story-box">
+      <div class="story-text">
+        <strong>Mochi 🐱</strong> the clever cat and <strong>Biscuit 🐶</strong> the brave dog have been best friends forever.
+        One day they stumbled into a mysterious puzzle temple deep in the forest.
+        The exit is sealed — the temple only opens for those who <strong>work together</strong>.
+        Neither can make it alone. Can you help them escape? 🏛️✨
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-card c1">
+        <div class="ctrl-av">🐱 Mochi</div><div class="ctrl-pl">PLAYER 1</div>
+        <div class="ctrl-keys">
+          <div class="key-row"><div class="key">W</div><div class="key-lbl">Jump</div></div>
+          <div class="key-row"><div class="key">A</div><div class="key">D</div><div class="key-lbl">Move</div></div>
+        </div>
+      </div>
+      <div class="ctrl-card c2">
+        <div class="ctrl-av">🐶 Biscuit</div><div class="ctrl-pl">PLAYER 2</div>
+        <div class="ctrl-keys">
+          <div class="key-row"><div class="key">↑</div><div class="key-lbl">Jump</div></div>
+          <div class="key-row"><div class="key">←</div><div class="key">→</div><div class="key-lbl">Move</div></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-pn" id="btnPN">🚀 Start Adventure!</button>
+    <button class="btn-bk" id="btnBk">← Back to Title</button>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud" style="display:none;">
+  <div class="hud-p h1"><div class="hud-av">🐱</div><div class="hud-info"><div class="hud-pnm">Mochi</div><div class="hud-kl">W / A / D</div></div></div>
+  <div class="hud-c"><div class="hud-lv" id="hudLv">Level 1/5</div><div class="hud-ln" id="hudNm">—</div></div>
+  <div class="hud-p h2"><div class="hud-av">🐶</div><div class="hud-info"><div class="hud-pnm">Biscuit</div><div class="hud-kl">↑ / ← / →</div></div></div>
+</div>
+
+<!-- CANVAS -->
+<canvas id="gameCanvas" width="900" height="508" style="display:none;"></canvas>
+
+<!-- TOAST -->
+<div id="toast" class="gone"></div>
+
+<!-- LEVEL COMPLETE -->
+<div class="screen hidden" id="sComplete">
+  <div class="cc">
+    <div class="cc-em" id="ccEm">🎉</div>
+    <div class="cc-ti">Level Clear!</div>
+    <div class="cc-su" id="ccSu">Amazing teamwork!</div>
+    <button class="btn-nx" id="btnNx">Next Level →</button>
+  </div>
+</div>
+
+<!-- WIN -->
+<div class="screen hidden" id="sWin">
+  <div class="win-card">
+    <div class="win-em">🏆</div>
+    <div class="win-ti">Escaped!</div>
+    <div class="win-su">Mochi &amp; Biscuit conquered all 5 temples!</div>
+    <button class="btn-rp" id="btnRp">Play Again 🎮</button>
+  </div>
+</div>
+
+</div><!-- /shell -->
+<script>
+// ═══════════════════════════════════════════════
+//  ENGINE — fixed 900×508 world, never rescales
+// ═══════════════════════════════════════════════
+const GW=900, GH=508;
+const GRAV=0.52, JFORCE=-12.8, BOOST=-17, SPD=4.3;
+
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+const keys={};
+window.addEventListener('keydown',e=>{keys[e.code]=true; e.preventDefault();});
+window.addEventListener('keyup',  e=>{keys[e.code]=false;});
+
+let p1,p2,lvl,curLvl=0,completing=false;
+
+// ──────────────────────────────────────────────
+//  LEVEL DATA
+//  F = floor top = GH-40 = 468
+//  Normal jump max height from floor ≈ 158px  (JFORCE²/2GRAV)
+//  Boost jump max height from floor  ≈ 278px
+//  When standing on partner (h=34): boost height from partner top ≈ 278px
+//  so boost from floor-level partner reaches floor-(278+34)=floor-312
+// ──────────────────────────────────────────────
+function makeLevels(){
+  const F=GH-40; // 468
+
+  return[
+  // ══ LV 1 ══ Introduction — navigate & meet at exit
+  {
+    name:'Hello, Temple!',
+    bg:['#E0F7FA','#FFF9F0'],
+    platforms:[
+      {x:0,  y:F,   w:900,h:40,s:'ground'},
+      // P1 left staircase
+      {x:60, y:F-90,w:130,h:16,s:'plat'},
+      {x:200,y:F-175,w:130,h:16,s:'plat'},
+      // P2 right staircase
+      {x:710,y:F-90,w:130,h:16,s:'plat'},
+      {x:570,y:F-175,w:130,h:16,s:'plat'},
+      // shared top
+      {x:340,y:F-270,w:220,h:16,s:'plat'},
+    ],
+    plates:[],gates:[],keys:[],doors:[],
+    exit:{x:390,y:F-270-58,w:120,h:58},
+    sp1:{x:50, y:F-60}, sp2:{x:770,y:F-60},
+    msgs:[
+      '🏛️ Welcome to the temple! Both Mochi & Biscuit must reach ⭐ EXIT!',
+      '🐱 Mochi: W A D keys   🐶 Biscuit: Arrow keys',
+      '💡 Climb the staircases and meet at the top!',
+    ]
+  },
+
+  // ══ LV 2 ══ Pressure Plates
+  // Two rooms split by a wall. Each wall has a gate-gap.
+  // P2 (right room) steps on RIGHT plate → opens LEFT gate → P1 walks to center.
+  // P1 climbs center platform, steps on UPPER plate → opens RIGHT gate → P2 enters center.
+  // Both climb to top exit.
+  {
+    name:'Push & Pull',
+    bg:['#FFF0E6','#FFF9F0'],
+    platforms:[
+      // Floors: left room, right room, tiny center island
+      {x:0,  y:F,   w:290,h:40,s:'ground'},
+      {x:610,y:F,   w:290,h:40,s:'ground'},
+      {x:335,y:F,   w:230,h:40,s:'ground'},
+
+      // Left dividing wall (solid top, gate gap in lower middle)
+      {x:284,y:F-340,w:22,h:180,s:'wall'}, // upper solid part
+      // gap F-160 to F = left gate occupies this
+      // Right dividing wall
+      {x:594,y:F-340,w:22,h:180,s:'wall'}, // upper solid part
+      // gap F-160 to F = right gate occupies this
+
+      // Center platforms P1 uses to climb to upper plate
+      {x:355,y:F-120,w:190,h:16,s:'plat'},
+      // Top platform — exit lives here
+      {x:320,y:F-255,w:260,h:16,s:'plat'},
+    ],
+    plates:[
+      // P2 stands on this (right room floor) → opens LEFT gate
+      {x:655,y:F-16,w:110,h:16,gateId:'GL',active:false},
+      // P1 stands on this (center upper platform) → opens RIGHT gate
+      {x:365,y:F-136,w:170,h:16,gateId:'GR',active:false},
+    ],
+    gates:[
+      // Left gate: fills the lower gap in left wall
+      {x:284,y:F-160,w:22,h:160,id:'GL',open:false},
+      // Right gate: fills the lower gap in right wall
+      {x:594,y:F-160,w:22,h:160,id:'GR',open:false},
+    ],
+    keys:[],doors:[],
+    exit:{x:370,y:F-255-58,w:160,h:58},
+    sp1:{x:50, y:F-60}, sp2:{x:760,y:F-60},
+    msgs:[
+      '💡 P2 🐶: Step on the ORANGE PLATE in your room to open the gate for P1!',
+      '💡 P1 🐱: Walk through the gate, climb up, and step on the UPPER PLATE!',
+      '💡 This opens P2\'s gate — then BOTH climb to ⭐ EXIT!',
+    ]
+  },
+
+  // ══ LV 3 ══ Boost Jump
+  // A high ledge (y = F-295) is 295px above floor — unreachable by normal jump (max 158px).
+  // Boost jump from a partner standing on floor = partner top is F-34, jump gives +278px → reaches F-312. Enough!
+  // P2 (dog) stands at boost spot in center. P1 (cat) walks to P2, jumps ON P2, then immediately
+  // jumps again → boost carries P1 up to high ledge.
+  // P2 cannot reach high ledge alone but uses a right-side staircase (max step ≤ 155px) to get there.
+  // Both converge on wide top platform → exit.
+  {
+    name:'Lift Me Up!',
+    bg:['#F0FFF4','#FFF9F0'],
+    platforms:[
+      {x:0,  y:F,   w:900,h:40,s:'ground'},
+
+      // ── BOOST SPOT: wide platform so P2 stands comfortably ──
+      // Keep it ON the floor (same y) — just a visual marker area.
+      // P2 will stand on floor at x≈390-490, P1 jumps on P2 from the left.
+
+      // High ledge — needs boost (295px above floor, player top when landing = F-295-34 = F-329)
+      {x:250,y:F-295,w:200,h:16,s:'plat'},
+
+      // P2 right staircase — each step ≤155px tall (reachable by normal jump)
+      {x:560,y:F-130,w:140,h:16,s:'plat'},  // step 1: 130px up
+      {x:680,y:F-255,w:140,h:16,s:'plat'},  // step 2: 125px above step 1
+
+      // Wide top platform connecting both sides — exit here
+      {x:250,y:F-295,w:570,h:16,s:'plat'},  // extends high ledge rightward to P2 staircase top
+    ],
+    plates:[],gates:[],keys:[],doors:[],
+    exit:{x:380,y:F-295-58,w:140,h:58},
+    sp1:{x:50, y:F-60}, sp2:{x:770,y:F-60},
+    // Marker: show a visual "boost here" zone
+    boostZoneX:370, boostZoneW:160,
+    msgs:[
+      '💡 Normal jump CAN\'T reach the top! You need a BOOST JUMP!',
+      '💡 P2 🐶: Walk to the CENTER and stand still under the ledge.',
+      '💡 P1 🐱: Jump ON P2, then immediately jump AGAIN for a super boost!',
+      '💡 P2 🐶: Use the RIGHT STAIRCASE to reach the top platform!',
+    ]
+  },
+
+  // ══ LV 4 ══ Key & Door
+  // A tall center wall divides left (P1) and right (P2) rooms.
+  // KEY is on raised platform in right room — P2 grabs it.
+  // PLATE is in left room on raised platform — P1 stands on it → opens gate in wall.
+  // P2 walks through gate carrying key, touches DOOR above gate → door opens.
+  // Both climb to top exit.
+  {
+    name:'The Vault',
+    bg:['#FFF0FF','#FFF9F0'],
+    platforms:[
+      {x:0,  y:F,   w:900,h:40,s:'ground'},
+
+      // Left room — plate platform
+      {x:40, y:F-130,w:160,h:16,s:'plat'},
+
+      // Center wall (no gate — gate is drawn separately)
+      {x:418,y:F-360,w:24,h:210,s:'wall'}, // upper solid part of wall
+
+      // Right room — key platform
+      {x:700,y:F-130,w:160,h:16,s:'plat'},
+
+      // Upper area above gate (accessible after door opens)
+      {x:80, y:F-290,w:740,h:16,s:'plat'},
+    ],
+    plates:[
+      // P1 stands here → opens center gate
+      {x:55,y:F-146,w:130,h:16,gateId:'GV',active:false},
+    ],
+    gates:[
+      // Center wall lower gap
+      {x:418,y:F-150,w:24,h:150,id:'GV',open:false},
+    ],
+    keys:[
+      {x:780,y:F-158,id:'K1',got:false},
+    ],
+    doors:[
+      // Door sits just above the gate — P2 must pass gate first, then open door with key
+      {x:409,y:F-295,w:40,h:106,keyId:'K1',open:false},
+    ],
+    exit:{x:375,y:F-290-58,w:150,h:58},
+    sp1:{x:50, y:F-60}, sp2:{x:800,y:F-60},
+    msgs:[
+      '💡 P1 🐱: Climb LEFT platform and stand on the ORANGE PLATE!',
+      '💡 P2 🐶: Grab the KEY 🔑 on the RIGHT platform!',
+      '💡 P2 🐶: Walk through the open gate and touch the PURPLE DOOR!',
+      '💡 Both climb to ⭐ EXIT at the top!',
+    ]
+  },
+
+  // ══ LV 5 ══ Grand Finale — all mechanics
+  // LEFT ROOM: P1 grabs KEY on tall shelf (needs boost from P2).
+  // RIGHT ROOM: P2 stands on PLATE → opens center gate.
+  // P1 (with key) walks through gate → touches DOOR.
+  // Both climb to top exit.
+  // Twist: P2 can't reach exit until P1 opens the door (door blocks upper path too).
+  {
+    name:'Grand Finale',
+    bg:['#E8F0FF','#FFF0FF'],
+    platforms:[
+      {x:0,  y:F,   w:900,h:40,s:'ground'},
+
+      // LEFT ROOM
+      // High shelf with key — needs boost (260px above floor)
+      {x:40, y:F-260,w:170,h:16,s:'plat'},
+
+      // Center wall
+      {x:428,y:F-380,w:24,h:230,s:'wall'}, // upper solid
+      // gate gap: F-150 to F
+
+      // RIGHT ROOM
+      // Plate platform
+      {x:690,y:F-130,w:160,h:16,s:'plat'},
+
+      // Wide top platform — exit lives here
+      {x:50, y:F-370,w:800,h:16,s:'plat'},
+    ],
+    plates:[
+      // P2 stands here → opens center gate (left side passage)
+      {x:700,y:F-146,w:140,h:16,gateId:'GF',active:false},
+    ],
+    gates:[
+      {x:428,y:F-150,w:24,h:150,id:'GF',open:false},
+    ],
+    keys:[
+      {x:125,y:F-288,id:'K2',got:false},
+    ],
+    doors:[
+      // Door blocks the upper center path
+      {x:419,y:F-385,w:42,h:130,keyId:'K2',open:false},
+    ],
+    exit:{x:375,y:F-370-58,w:150,h:58},
+    // Boost zone hint: center of left room
+    boostZoneX:140, boostZoneW:160,
+    sp1:{x:50, y:F-60}, sp2:{x:800,y:F-60},
+    msgs:[
+      '💡 FINAL CHALLENGE — use everything you\'ve learned!',
+      '💡 P2 🐶: Stand still in LEFT CENTER. P1 🐱: Boost off P2 to grab the KEY!',
+      '💡 P2 🐶: Go RIGHT and stand on the PLATE to open the gate!',
+      '💡 P1 🐱: Walk through the gate and open the DOOR with your key!',
+      '💡 Both race to the ⭐ EXIT at the very top!',
+    ]
+  },
+  ];
+}
+
+// ─── PLAYER ───
+class Player{
+  constructor(id,x,y,isP1){
+    this.id=id;this.isP1=isP1;
+    this.x=x;this.y=y;this.w=34;this.h=34;
+    this.vx=0;this.vy=0;this.onGround=false;
+    this.hasKey=false;this.dir=1;this.squish=0;
+    this.wasJump=false;
+  }
+  get cx(){return this.x+this.w/2;}
+  get bot(){return this.y+this.h;}
+  get right(){return this.x+this.w;}
+}
+
+function ov(ax,ay,aw,ah,bx,by,bw,bh){
+  return ax<bx+bw&&ax+aw>bx&&ay<by+bh&&ay+ah>by;
+}
+
+// ─── SPAWN ───
+function spawnLvl(){
+  const LEVELS=makeLevels();
+  lvl=JSON.parse(JSON.stringify(LEVELS[curLvl]));
+  p1=new Player(1,lvl.sp1.x,lvl.sp1.y,true);
+  p2=new Player(2,lvl.sp2.x,lvl.sp2.y,false);
+  completing=false;
+  document.getElementById('hudLv').textContent=`Level ${curLvl+1} / 5`;
+  document.getElementById('hudNm').textContent=lvl.name;
+  showMsgs(lvl.msgs);
+}
+
+let _msgQ=[],_msgI=0,_toastT=0;
+function showMsgs(arr){_msgQ=arr;_msgI=0;showToast(_msgQ[_msgI++]);}
+function showToast(txt,dur=4000){
+  const el=document.getElementById('toast');
+  el.textContent=txt;el.classList.remove('gone');
+  clearTimeout(_toastT);
+  _toastT=setTimeout(()=>{
+    el.classList.add('gone');
+    setTimeout(()=>{if(_msgI<_msgQ.length)showToast(_msgQ[_msgI++]);},700);
+  },dur);
+}
+
+// ─── SOLIDS ───
+function buildSolids(){
+  const s=[...lvl.platforms];
+  for(const g of lvl.gates)  if(!g.open) s.push({x:g.x,y:g.y,w:g.w,h:g.h,s:'wall'});
+  for(const d of lvl.doors)  if(!d.open) s.push({x:d.x,y:d.y,w:d.w,h:d.h,s:'wall'});
+  return s;
+}
+
+// ─── COLLISION ───
+function resolveVsWalls(pl,solids){
+  pl.onGround=false;
+  for(const s of solids){
+    if(!ov(pl.x,pl.y,pl.w,pl.h,s.x,s.y,s.w,s.h))continue;
+    const oL=pl.right-s.x, oR=s.x+s.w-pl.x;
+    const oT=pl.bot-s.y,   oB=s.y+s.h-pl.y;
+    const mH=Math.min(oL,oR), mV=Math.min(oT,oB);
+    if(mV<=mH){
+      if(oT<oB){pl.y=s.y-pl.h;if(pl.vy>0){pl.vy=0;pl.squish=8;}pl.onGround=true;}
+      else     {pl.y=s.y+s.h; if(pl.vy<0)pl.vy=0;}
+    }else{
+      if(oL<oR){pl.x=s.x-pl.w;if(pl.vx>0)pl.vx=0;}
+      else     {pl.x=s.x+s.w; if(pl.vx<0)pl.vx=0;}
+    }
+  }
+}
+
+function resolveVsPartner(mover,other){
+  if(!ov(mover.x,mover.y,mover.w,mover.h,other.x,other.y,other.w,other.h))return;
+  const oL=mover.right-other.x, oR=other.right-mover.x;
+  const oT=mover.bot-other.y,   oB=other.bot-mover.y;
+  const mH=Math.min(oL,oR), mV=Math.min(oT,oB);
+  if(mV<=mH&&oT<oB&&mover.vy>=0){
+    mover.y=other.y-mover.h;if(mover.vy>0)mover.vy=0;mover.onGround=true;
+  }else{
+    if(oL<oR){mover.x=other.x-mover.w;if(mover.vx>0)mover.vx=0;}
+    else     {mover.x=other.x+other.w; if(mover.vx<0)mover.vx=0;}
+  }
+}
+
+function onTopOfPartner(pl,partner){
+  return pl.onGround
+    &&pl.bot>=partner.y-4&&pl.bot<=partner.y+10
+    &&pl.right>partner.x+6&&pl.x<partner.right-6;
+}
+
+// ─── UPDATE ───
+function update(){
+  if(!p1||!p2||completing)return;
+
+  // Input
+  const p1L=keys['KeyA'],p1R=keys['KeyD'],p1J=keys['KeyW'];
+  const p2L=keys['ArrowLeft'],p2R=keys['ArrowRight'],p2J=keys['ArrowUp'];
+
+  if(p1L){p1.vx=-SPD;p1.dir=-1;}else if(p1R){p1.vx=SPD;p1.dir=1;}else p1.vx*=0.55;
+  if(p2L){p2.vx=-SPD;p2.dir=-1;}else if(p2R){p2.vx=SPD;p2.dir=1;}else p2.vx*=0.55;
+
+  if(p1J&&!p1.wasJump&&p1.onGround){
+    p1.vy=onTopOfPartner(p1,p2)?BOOST:JFORCE; p1.squish=10;
+  }
+  if(p2J&&!p2.wasJump&&p2.onGround){
+    p2.vy=onTopOfPartner(p2,p1)?BOOST:JFORCE; p2.squish=10;
+  }
+  p1.wasJump=p1J; p2.wasJump=p2J;
+
+  p1.vy+=GRAV; p2.vy+=GRAV;
+  p1.x+=p1.vx;p1.y+=p1.vy;
+  p2.x+=p2.vx;p2.y+=p2.vy;
+  if(p1.squish>0)p1.squish--;
+  if(p2.squish>0)p2.squish--;
+
+  // Screen clamp
+  const cl=(pl)=>{
+    if(pl.x<0){pl.x=0;pl.vx=0;}
+    if(pl.x+pl.w>GW){pl.x=GW-pl.w;pl.vx=0;}
+  };
+  cl(p1);cl(p2);
+
+  const solids=buildSolids();
+  resolveVsWalls(p1,solids);
+  resolveVsWalls(p2,solids);
+  resolveVsPartner(p1,p2);
+  resolveVsPartner(p2,p1);
+
+  // Fall reset
+  const rst=(pl,sp)=>{
+    pl.x=sp.x;pl.y=sp.y;pl.vx=0;pl.vy=0;pl.hasKey=false;
+    lvl.keys.forEach(k=>k.got=false);
+    lvl.doors.forEach(d=>d.open=false);
+  };
+  if(p1.y>GH+80)rst(p1,lvl.sp1);
+  if(p2.y>GH+80)rst(p2,lvl.sp2);
+
+  // Pressure plates
+  const grpA={},grpC={};
+  for(const plate of lvl.plates){
+    const on=(pl)=>pl.bot>=plate.y-2&&pl.bot<=plate.y+plate.h+8
+                  &&pl.right>plate.x+6&&pl.x<plate.x+plate.w-6;
+    plate.active=on(p1)||on(p2);
+    grpC[plate.gateId]=(grpC[plate.gateId]||0)+1;
+    if(plate.active)grpA[plate.gateId]=(grpA[plate.gateId]||0)+1;
+  }
+  for(const g of lvl.gates) g.open=(grpA[g.id]||0)>=(grpC[g.id]||1);
+
+  // Key pickup
+  for(const k of lvl.keys){
+    if(k.got)continue;
+    if(ov(p1.x,p1.y,p1.w,p1.h,k.x-15,k.y-15,30,30)){k.got=true;p1.hasKey=true;}
+    if(ov(p2.x,p2.y,p2.w,p2.h,k.x-15,k.y-15,30,30)){k.got=true;p2.hasKey=true;}
+  }
+
+  // Door unlock
+  for(const d of lvl.doors){
+    if(d.open)continue;
+    const carrier=p1.hasKey?p1:p2.hasKey?p2:null;
+    if(carrier&&ov(carrier.x,carrier.y,carrier.w,carrier.h,d.x,d.y,d.w,d.h)){
+      d.open=true;
+      if(p1.hasKey)p1.hasKey=false; else p2.hasKey=false;
+    }
+  }
+
+  // Exit check
+  const ex=lvl.exit;
+  const doorBlock=lvl.doors.some(d=>!d.open);
+  if(ov(p1.x,p1.y,p1.w,p1.h,ex.x,ex.y,ex.w,ex.h)
+   &&ov(p2.x,p2.y,p2.w,p2.h,ex.x,ex.y,ex.w,ex.h)
+   &&!doorBlock&&!completing){
+    completing=true;
+    confetti();
+    setTimeout(()=>{
+      const ems=['🎉','🎯','🚀','💎','🏆'];
+      const msgs=[
+        'First steps together — well done!',
+        'Gate masters! Perfect plate timing!',
+        'Boosted to victory — sky high teamwork!',
+        'The vault is open! Unstoppable duo!',
+        'LEGENDARY! The temple is conquered!',
+      ];
+      document.getElementById('ccEm').textContent=ems[curLvl]||'🎉';
+      document.getElementById('ccSu').textContent=msgs[curLvl]||'Amazing!';
+      if(curLvl>=4)showScreen('sWin');
+      else         showScreen('sComplete');
+    },700);
+  }
+}
+
+// ─── DRAW ───
+const cloudS=[{px:.08,py:.1,s:.9},{px:.26,py:.06,s:.7},{px:.5,py:.09,s:1.1},
+              {px:.68,py:.05,s:.8},{px:.87,py:.12,s:1.0}];
+let cOff=0;
+
+function draw(){
+  ctx.clearRect(0,0,GW,GH);
+  // Sky
+  const sg=ctx.createLinearGradient(0,0,0,GH);
+  sg.addColorStop(0,lvl.bg[0]);sg.addColorStop(1,lvl.bg[1]);
+  ctx.fillStyle=sg;ctx.fillRect(0,0,GW,GH);
+  // Clouds
+  cOff=(cOff+.10)%GW;
+  ctx.save();ctx.globalAlpha=.45;
+  for(const c of cloudS){
+    const cx=((c.px*GW+cOff)%GW),cy=c.py*GH,s=c.s;
+    ctx.fillStyle='#fff';
+    ctx.beginPath();
+    ctx.ellipse(cx,cy,48*s,20*s,0,0,Math.PI*2);
+    ctx.ellipse(cx-26*s,cy+5*s,30*s,14*s,0,0,Math.PI*2);
+    ctx.ellipse(cx+26*s,cy+5*s,30*s,14*s,0,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // Boost zone hint
+  if(lvl.boostZoneX){
+    const bx=lvl.boostZoneX,bw=lvl.boostZoneW,F=GH-40;
+    ctx.save();
+    ctx.globalAlpha=.12;
+    ctx.fillStyle='#4ECDC4';
+    ctx.fillRect(bx,F-40,bw,40);
+    ctx.globalAlpha=.55;
+    ctx.font='bold 10px Nunito';ctx.textAlign='center';ctx.fillStyle='#2EA89E';
+    ctx.fillText('BOOST ZONE',bx+bw/2,F-8);
+    ctx.restore();
+  }
+
+  for(const p of lvl.platforms)drawPlat(p);
+  for(const g of lvl.gates)if(!g.open)drawGate(g);
+  for(const p of lvl.plates)drawPlate(p);
+  for(const k of lvl.keys)if(!k.got)drawKey(k.x,k.y);
+  for(const d of lvl.doors)if(!d.open)drawDoor(d);
+  drawExit(lvl.exit);
+  drawPlayer(p2);
+  drawPlayer(p1);
+  if(p1.hasKey)drawCarryKey(p1);
+  if(p2.hasKey)drawCarryKey(p2);
+}
+
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);}
+
+const platColors={ground:['#6BCB77','#4DA35C'],plat:['#FFB347','#D4832A'],wall:['#A8DADC','#6BADB0']};
+function drawPlat(p){
+  const[top,bot]=platColors[p.s]||platColors.plat;
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.10)';ctx.shadowBlur=6;ctx.shadowOffsetY=3;
+  ctx.fillStyle=bot;rr(p.x,p.y+4,p.w,p.h,8);ctx.fill();
+  ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+  ctx.fillStyle=top;rr(p.x,p.y,p.w,p.h-2,8);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.18)';rr(p.x+6,p.y+4,p.w-12,5,3);ctx.fill();
+  ctx.restore();
+}
+function drawGate(g){
+  ctx.save();
+  ctx.fillStyle='#FF6B6B';ctx.globalAlpha=.88;rr(g.x,g.y,g.w,g.h,4);ctx.fill();
+  ctx.globalAlpha=.35;ctx.fillStyle='#fff';
+  for(let y=g.y+8;y<g.y+g.h-8;y+=11){ctx.fillRect(g.x+3,y,g.w-6,4);}
+  ctx.restore();
+  ctx.save();ctx.font='13px serif';ctx.textAlign='center';
+  ctx.fillText('🔒',g.x+g.w/2,g.y+g.h/2+5);ctx.restore();
+}
+function drawPlate(p){
+  const col=p.active?'#6BCB77':'#FF9F1C';
+  ctx.save();
+  ctx.shadowColor=p.active?'rgba(107,203,119,.6)':'rgba(255,159,28,.4)';
+  ctx.shadowBlur=p.active?14:6;
+  ctx.fillStyle=col;rr(p.x,p.y,p.w,p.h,5);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.45)';rr(p.x+4,p.y+3,p.w-8,4,2);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.font='bold 9px Nunito';ctx.textAlign='center';ctx.fillStyle='#fff';
+  ctx.fillText(p.active?'✓':'▼',p.x+p.w/2,p.y+p.h-2);
+  ctx.restore();
+}
+function drawKey(x,y){
+  const t=Date.now()/700;
+  ctx.save();ctx.translate(x,y+Math.sin(t)*4);
+  ctx.shadowColor='#FFD166';ctx.shadowBlur=14;
+  ctx.font='26px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('🔑',0,0);ctx.restore();
+}
+function drawCarryKey(pl){
+  ctx.save();ctx.font='16px serif';ctx.textAlign='center';
+  ctx.fillText('🔑',pl.cx,pl.y-12);ctx.restore();
+}
+function drawDoor(d){
+  ctx.save();
+  ctx.fillStyle='#9B4EC7';rr(d.x-3,d.y,d.w+6,d.h+4,9);ctx.fill();
+  ctx.fillStyle='#C77DFF';rr(d.x,d.y+3,d.w,d.h,7);ctx.fill();
+  ctx.fillStyle='#FFD166';ctx.beginPath();ctx.arc(d.x+d.w/2,d.y+d.h/2-8,7,0,Math.PI*2);ctx.fill();
+  ctx.font='13px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('🔑',d.x+d.w/2,d.y+d.h/2-8);ctx.restore();
+}
+function drawExit(ex){
+  const t=Date.now()/900;
+  ctx.save();
+  ctx.shadowColor='#FFD166';ctx.shadowBlur=20+Math.sin(t)*8;
+  ctx.fillStyle='#E0A800';rr(ex.x-4,ex.y,ex.w+8,ex.h+6,10);ctx.fill();
+  ctx.fillStyle='#FFD166';rr(ex.x,ex.y+4,ex.w,ex.h,8);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.font='26px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('⭐',ex.x+ex.w/2,ex.y+ex.h/2+Math.sin(t)*3);
+  ctx.font='bold 10px Nunito';ctx.fillStyle='#8B6914';ctx.textBaseline='alphabetic';
+  ctx.fillText('EXIT',ex.x+ex.w/2,ex.y-8);ctx.restore();
+}
+
+// ── Animal players ──
+function drawPlayer(pl){
+  const col=pl.isP1?'#FF6B6B':'#4ECDC4';
+  const drk=pl.isP1?'#C94040':'#2EA89E';
+  const sq=pl.squish/10;
+  const sx=pl.isP1?(1+sq*.18):(1+sq*.16);
+  const sy=pl.isP1?(1-sq*.14):(1-sq*.12);
+  ctx.save();
+  ctx.translate(pl.cx,pl.y+pl.h/2);
+  ctx.scale(pl.dir*sx,sy);
+  const r=pl.w/2;
+  // shadow
+  ctx.save();ctx.globalAlpha=.1;ctx.fillStyle='#000';
+  ctx.scale(1,.3);ctx.beginPath();ctx.ellipse(0,r+6,r+2,r,0,0,Math.PI*2);ctx.fill();ctx.restore();
+  // body
+  ctx.shadowColor=col;ctx.shadowBlur=10;ctx.fillStyle=col;
+  ctx.beginPath();ctx.ellipse(0,0,r,r,0,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;
+  // tummy
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.ellipse(0,4,r*.5,r*.4,0,0,Math.PI*2);ctx.fill();
+
+  if(pl.isP1){
+    // CAT ears
+    ctx.fillStyle=drk;
+    ctx.beginPath();ctx.moveTo(-r+2,-r+5);ctx.lineTo(-r+9,-r-11);ctx.lineTo(-r+17,-r+2);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(r-2,-r+5);ctx.lineTo(r-9,-r-11);ctx.lineTo(r-17,-r+2);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(255,190,190,.75)';
+    ctx.beginPath();ctx.moveTo(-r+5,-r+5);ctx.lineTo(-r+9,-r-6);ctx.lineTo(-r+14,-r+3);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(r-5,-r+5);ctx.lineTo(r-9,-r-6);ctx.lineTo(r-14,-r+3);ctx.closePath();ctx.fill();
+    // whiskers
+    ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(-3,3);ctx.lineTo(-r-7,0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(-3,6);ctx.lineTo(-r-7,8);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(3,3);ctx.lineTo(r+7,0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(3,6);ctx.lineTo(r+7,8);ctx.stroke();
+  }else{
+    // DOG ears
+    ctx.fillStyle=drk;
+    ctx.save();ctx.translate(-r+2,-r+5);ctx.rotate(-.18);
+    ctx.beginPath();ctx.ellipse(0,0,7,13,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(r-2,-r+5);ctx.rotate(.18);
+    ctx.beginPath();ctx.ellipse(0,0,7,13,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    // snout
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.beginPath();ctx.ellipse(0,6,8,5,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=drk;ctx.beginPath();ctx.ellipse(0,3,3.5,2.5,0,0,Math.PI*2);ctx.fill();
+  }
+
+  // eyes
+  const ey=pl.isP1?-7:-6;
+  ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.ellipse(-7,ey,5,5.5,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(7,ey,5,5.5,0,0,Math.PI*2);ctx.fill();
+  const ev=Math.max(-2,Math.min(2,pl.vx*.4));
+  ctx.fillStyle='#2D3047';
+  ctx.beginPath();ctx.ellipse(-7+ev,ey+1,3,3.5,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(7+ev,ey+1,3,3.5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.arc(-5.5+ev,ey-1,1.2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(8.5+ev,ey-1,1.2,0,Math.PI*2);ctx.fill();
+
+  // mouth
+  ctx.strokeStyle='#2D3047';ctx.lineWidth=1.6;ctx.lineCap='round';
+  ctx.beginPath();
+  if(!pl.onGround)ctx.arc(0,9,4,0,Math.PI);
+  else            ctx.arc(0,8,4,.2,Math.PI-.2);
+  ctx.stroke();
+
+  // number badge
+  ctx.fillStyle='rgba(255,255,255,.92)';ctx.beginPath();ctx.arc(r-4,-r+4,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=drk;ctx.font='bold 9px Nunito';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(pl.isP1?'1':'2',r-4,-r+4);
+
+  ctx.restore();
+}
+
+// ─── CONFETTI ───
+function confetti(){
+  const em=['⭐','🎉','✨','🌟','💫','🎊','🐱','🐶'];
+  for(let i=0;i<22;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='conf';
+      el.textContent=em[Math.floor(Math.random()*em.length)];
+      el.style.cssText=`left:${Math.random()*100}vw;top:-30px;font-size:${14+Math.random()*18}px;`+
+        `animation-duration:${.9+Math.random()*.8}s;animation-delay:${Math.random()*.4}s;`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),2000);
+    },i*50);
+  }
+}
+
+// ─── SCREEN MANAGER ───
+function showScreen(id){
+  ['sTitle','sHowto','sComplete','sWin'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  const hud=document.getElementById('hud'), cnv=document.getElementById('gameCanvas');
+  if(id==='game'){hud.style.display='';cnv.style.display='';}
+  else{hud.style.display='none';cnv.style.display='none';document.getElementById(id).classList.remove('hidden');}
+}
+
+// ─── WIRING ───
+document.getElementById('btnSt').onclick=()=>{curLvl=0;showScreen('game');spawnLvl();};
+document.getElementById('btnH').onclick=()=>showScreen('sHowto');
+document.getElementById('btnPN').onclick=()=>{curLvl=0;showScreen('game');spawnLvl();};
+document.getElementById('btnBk').onclick=()=>showScreen('sTitle');
+document.getElementById('btnNx').onclick=()=>{curLvl++;showScreen('game');spawnLvl();};
+document.getElementById('btnRp').onclick=()=>{curLvl=0;showScreen('sTitle');};
+
+// ─── TITLE BUBBLES ───
+(()=>{
+  const deco=document.getElementById('titleBub');
+  const cols=['#FF6B6B','#4ECDC4','#FFD166','#6BCB77','#C77DFF','#FFB347'];
+  for(let i=0;i<16;i++){
+    const b=document.createElement('div');b.className='tb';
+    const sz=30+Math.random()*100;
+    b.style.cssText=`width:${sz}px;height:${sz}px;background:${cols[i%cols.length]};`+
+      `left:${Math.random()*100}%;animation-duration:${5+Math.random()*8}s;animation-delay:-${Math.random()*8}s;`;
+    deco.appendChild(b);
+  }
+})();
+
+// ─── GAME LOOP ───
+function loop(){
+  if(document.getElementById('gameCanvas').style.display!=='none'){update();draw();}
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

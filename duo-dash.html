@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duo Dash 🌟 Co-op Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --p1: #FF6B6B;
+    --p2: #4ECDC4;
+    --bg: #FFF9F0;
+    --ground: #6BCB77;
+    --ground-dark: #4DA35C;
+    --platform: #FFB347;
+    --platform-dark: #E0943A;
+    --wall: #A8DADC;
+    --wall-dark: #7FB8BA;
+    --ui-bg: rgba(255,255,255,0.92);
+    --shadow: rgba(0,0,0,0.12);
+    --star: #FFD166;
+    --door: #C77DFF;
+    --key: #FFD166;
+    --plate: #FF9F1C;
+    --plate-active: #6BCB77;
+    --text-dark: #2D3047;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .screen.hidden { opacity: 0; pointer-events: none; transform: scale(0.96); }
+
+  /* TITLE SCREEN */
+  #titleScreen {
+    background: linear-gradient(135deg, #FFF0DC 0%, #FFE5F1 50%, #E0F7FA 100%);
+  }
+  .title-deco {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.18;
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) scale(0.5); }
+    100% { transform: translateY(-200px) scale(1.2); }
+  }
+
+  .title-card {
+    background: white;
+    border-radius: 32px;
+    padding: 48px 64px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 0 0 6px rgba(255,255,255,0.8);
+    position: relative;
+    z-index: 1;
+    max-width: 560px;
+    width: 90%;
+  }
+  .game-logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 72px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+    filter: drop-shadow(2px 4px 0px rgba(0,0,0,0.08));
+  }
+  .game-subtitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #aaa;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .players-preview {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  .player-card {
+    background: #f8f8f8;
+    border-radius: 20px;
+    padding: 16px 24px;
+    text-align: center;
+    border: 3px solid transparent;
+  }
+  .player-card.p1 { border-color: var(--p1); }
+  .player-card.p2 { border-color: var(--p2); }
+  .player-icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+  }
+  .player-label {
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .p1 .player-label { color: var(--p1); }
+  .p2 .player-label { color: var(--p2); }
+  .player-controls {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+  }
+
+  .start-btn {
+    background: linear-gradient(135deg, var(--p1), #FF8E53);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 56px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 rgba(200,80,80,0.4), 0 10px 30px rgba(255,107,107,0.35);
+    transition: transform 0.1s, box-shadow 0.1s;
+    letter-spacing: 1px;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 rgba(200,80,80,0.4), 0 14px 35px rgba(255,107,107,0.4); }
+  .start-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(200,80,80,0.4), 0 6px 20px rgba(255,107,107,0.3); }
+
+  /* LEVEL COMPLETE */
+  #levelComplete {
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+  }
+  .complete-card {
+    background: white;
+    border-radius: 28px;
+    padding: 48px 64px;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+    animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .complete-emoji { font-size: 72px; margin-bottom: 12px; }
+  .complete-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 42px;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+  .complete-sub { color: #888; font-size: 16px; font-weight: 600; margin-bottom: 28px; }
+  .next-btn {
+    background: linear-gradient(135deg, #6BCB77, #4DA35C);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 48px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 rgba(60,140,70,0.4);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .next-btn:hover { transform: translateY(-2px); }
+  .next-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(60,140,70,0.4); }
+
+  /* WIN SCREEN */
+  #winScreen {
+    background: linear-gradient(135deg, #FFF0DC, #FFE5F1, #E0F7FA);
+  }
+  .win-card {
+    background: white;
+    border-radius: 32px;
+    padding: 56px 72px;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.14);
+    animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .win-emoji { font-size: 80px; margin-bottom: 12px; }
+  .win-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 52px;
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .win-sub { color: #888; font-size: 18px; font-weight: 700; margin: 10px 0 28px; }
+  .replay-btn {
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 56px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 rgba(100,100,200,0.3);
+    transition: transform 0.1s;
+  }
+  .replay-btn:hover { transform: translateY(-2px); }
+
+  /* GAME WRAPPER */
+  #gameWrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HUD */
+  #hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 50;
+    background: white;
+    border-bottom: 3px solid #f0f0f0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .hud-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f8f8;
+    border-radius: 14px;
+    padding: 8px 16px;
+    border: 2.5px solid transparent;
+  }
+  .hud-player.p1 { border-color: var(--p1); }
+  .hud-player.p2 { border-color: var(--p2); }
+  .hud-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .p1 .hud-dot { background: var(--p1); }
+  .p2 .hud-dot { background: var(--p2); }
+  .hud-name { font-weight: 800; font-size: 13px; }
+  .hud-name.p1c { color: var(--p1); }
+  .hud-name.p2c { color: var(--p2); }
+  .hud-keys { font-size: 11px; color: #aaa; font-weight: 700; }
+
+  .hud-center {
+    text-align: center;
+  }
+  .hud-level {
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    color: var(--text-dark);
+    line-height: 1.1;
+  }
+  .hud-level-name {
+    font-size: 11px;
+    color: #aaa;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hud-goal {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f8f8;
+    border-radius: 14px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    border: 2.5px solid #eee;
+  }
+  .goal-icon { font-size: 18px; }
+
+  /* CANVAS */
+  #gameCanvas {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 64px);
+    display: block;
+  }
+
+  /* TUTORIAL TOAST */
+  #tutorialToast {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(45,48,71,0.92);
+    color: white;
+    border-radius: 20px;
+    padding: 14px 28px;
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 60;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    text-align: center;
+    max-width: 500px;
+    backdrop-filter: blur(4px);
+  }
+  #tutorialToast.fade { opacity: 0; }
+
+  /* Stars confetti */
+  .confetti-star {
+    position: fixed;
+    pointer-events: none;
+    font-size: 24px;
+    animation: confettiFall 1.2s ease-in forwards;
+    z-index: 200;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-30px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div class="screen" id="titleScreen">
+  <div class="title-deco" id="titleDeco"></div>
+  <div class="title-card">
+    <div class="game-logo">Duo Dash</div>
+    <div class="game-subtitle">Co-op Adventure</div>
+    <div class="players-preview">
+      <div class="player-card p1">
+        <div class="player-icon">🔴</div>
+        <div class="player-label">PLAYER 1</div>
+        <div class="player-controls">W A S D</div>
+      </div>
+      <div class="player-card p2">
+        <div class="player-icon">🔵</div>
+        <div class="player-label">PLAYER 2</div>
+        <div class="player-controls">↑ ← ↓ →</div>
+      </div>
+    </div>
+    <button class="start-btn" id="startBtn">Let's Go! 🚀</button>
+  </div>
+</div>
+
+<!-- LEVEL COMPLETE SCREEN -->
+<div class="screen hidden" id="levelComplete">
+  <div class="complete-card">
+    <div class="complete-emoji" id="completeEmoji">🎉</div>
+    <div class="complete-title">Level Clear!</div>
+    <div class="complete-sub" id="completeSub">Great teamwork! Keep it up!</div>
+    <button class="next-btn" id="nextBtn">Next Level →</button>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div class="screen hidden" id="winScreen">
+  <div class="win-card">
+    <div class="win-emoji">🏆</div>
+    <div class="win-title">You Did It!</div>
+    <div class="win-sub">All 5 levels conquered together!</div>
+    <button class="replay-btn" id="replayBtn">Play Again 🎮</button>
+  </div>
+</div>
+
+<!-- GAME WRAPPER -->
+<div id="gameWrapper" style="display:none;">
+  <div id="hud">
+    <div class="hud-player p1">
+      <div class="hud-dot"></div>
+      <div>
+        <div class="hud-name p1c">Player 1</div>
+        <div class="hud-keys">W/A/S/D</div>
+      </div>
+    </div>
+    <div class="hud-center">
+      <div class="hud-level" id="hudLevel">Level 1</div>
+      <div class="hud-level-name" id="hudLevelName">Tutorial</div>
+    </div>
+    <div class="hud-player p2">
+      <div class="hud-dot"></div>
+      <div>
+        <div class="hud-name p2c">Player 2</div>
+        <div class="hud-keys">↑/←/↓/→</div>
+      </div>
+    </div>
+  </div>
+  <canvas id="gameCanvas"></canvas>
+  <div id="tutorialToast"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  GAME ENGINE
+// ─────────────────────────────────────────────
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let W, H;
+function resize() {
+  W = canvas.width = canvas.offsetWidth;
+  H = canvas.height = canvas.offsetHeight;
+}
+
+// Keys
+const keys = {};
+window.addEventListener('keydown', e => { keys[e.code] = true; e.preventDefault(); });
+window.addEventListener('keyup', e => { keys[e.code] = false; });
+
+// Colors
+const COLORS = {
+  p1: '#FF6B6B', p1dark: '#E04545',
+  p2: '#4ECDC4', p2dark: '#2EA89E',
+  ground: '#6BCB77', groundDark: '#4DA35C',
+  platform: '#FFB347', platformDark: '#E0943A',
+  wall: '#A8DADC', wallDark: '#7FB8BA',
+  door: '#C77DFF', doorDark: '#9B4EC7',
+  key: '#FFD166', keyDark: '#E0B030',
+  plate: '#FF9F1C', plateActive: '#6BCB77',
+  gate: '#FF6B6B', gateOpen: '#6BCB77',
+  exit: '#FFD166',
+  bg: '#FFF9F0',
+  sky1: '#E0F7FA', sky2: '#FFF9F0',
+  cloud: '#fff',
+  star: '#FFD166',
+};
+
+// ─── PHYSICS CONSTANTS ───
+const GRAVITY = 0.55;
+const JUMP = -13;
+const SPEED = 4.5;
+const BOOST_JUMP = -15;
+
+// ─── PLAYER ───
+class Player {
+  constructor(id, color, colorDark, x, y) {
+    this.id = id;
+    this.color = color;
+    this.colorDark = colorDark;
+    this.x = x; this.y = y;
+    this.w = 36; this.h = 36;
+    this.vx = 0; this.vy = 0;
+    this.onGround = false;
+    this.hasKey = false;
+    this.dead = false;
+    this.face = 1;
+    this.wobble = 0;
+    this.eyeOff = 0;
+  }
+  get cx() { return this.x + this.w/2; }
+  get cy() { return this.y + this.h/2; }
+  get bottom() { return this.y + this.h; }
+  get right() { return this.x + this.w; }
+}
+
+// ─── GAME STATE ───
+let p1, p2, level, currentLevel = 0;
+let showingComplete = false;
+let tutorialTimer = 0;
+let tutorialMsg = '';
+
+// ─── LEVEL DEFINITIONS ───
+// Each tile is 48x48. Canvas is W x H.
+// Platform: {x,y,w,h}
+// pressure plate: {x,y,w,h, id}  → opens gate with matching id
+// gate: {x,y,w,h, id, open}
+// key: {x,y, id, collected}
+// door: {x,y, keyId, open}  → needs matching key
+// exit: {x,y,w,h}
+// boost zone: automatic when one player stands on top of other
+
+function buildLevel(idx) {
+  const levels = [
+    // ── LEVEL 1: Learn to jump & meet at exit ──
+    {
+      name: "Hello World",
+      hint: "💡 Both players must reach the golden door together!",
+      bgColor: ['#E0F7FA','#FFF9F0'],
+      platforms: [
+        {x:0, y:H-40, w:W, h:40, type:'ground'},          // floor
+        {x:160, y:H-140, w:120, h:18, type:'platform'},    // p1 step
+        {x:W-280, y:H-140, w:120, h:18, type:'platform'},  // p2 step
+        {x:W/2-80, y:H-220, w:160, h:18, type:'platform'}, // middle top
+      ],
+      pressurePlates: [],
+      gates: [],
+      keys: [],
+      doors: [],
+      exit: {x:W/2-30, y:H-220-52, w:60, h:52},
+      spawnP1: {x:80, y:H-120},
+      spawnP2: {x:W-116, y:H-120},
+    },
+    // ── LEVEL 2: Pressure plates ──
+    {
+      name: "Two Keys",
+      hint: "💡 Both players must stand on the orange plates at the same time to open the gate!",
+      bgColor: ['#FFF0E6','#FFF9F0'],
+      platforms: [
+        {x:0, y:H-40, w:W, h:40, type:'ground'},
+        {x:0, y:H-40, w:200, h:40, type:'ground'},
+        {x:W-200, y:H-40, w:200, h:40, type:'ground'},
+        {x:W/2-30, y:H-40, w:60, h:40, type:'ground'},     // middle island
+        {x:W/2-180, y:H-160, w:120, h:18, type:'platform'},
+        {x:W/2+60, y:H-160, w:120, h:18, type:'platform'},
+      ],
+      pressurePlates: [
+        {x:60, y:H-52, w:80, h:12, id:'A', active:false},
+        {x:W-140, y:H-52, w:80, h:12, id:'A', active:false},
+      ],
+      gates: [
+        {x:W/2-14, y:H-160, w:28, h:120, id:'A', open:false},
+      ],
+      keys: [],
+      doors: [],
+      exit: {x:W/2-30, y:H-200, w:60, h:52},
+      spawnP1: {x:80, y:H-120},
+      spawnP2: {x:W-116, y:H-120},
+    },
+    // ── LEVEL 3: Boost jump ──
+    {
+      name: "Lift Me Up!",
+      hint: "💡 One player stands still — the other JUMPS on them to reach the high platform!",
+      bgColor: ['#F0FFF4','#FFF9F0'],
+      platforms: [
+        {x:0, y:H-40, w:W, h:40, type:'ground'},
+        {x:100, y:H-40, w:200, h:40, type:'ground'},     // left base
+        {x:60, y:H-220, w:120, h:18, type:'platform'},   // high left
+        {x:220, y:H-340, w:140, h:18, type:'platform'},  // very high
+        {x:W/2+20, y:H-200, w:120, h:18, type:'platform'},
+        {x:W-200, y:H-40, w:200, h:40, type:'ground'},
+        {x:W/2-60, y:H-40, w:120, h:40, type:'ground'},  // middle ground
+      ],
+      pressurePlates: [],
+      gates: [],
+      keys: [],
+      doors: [],
+      boostZone: true,
+      exit: {x:240, y:H-340-52, w:60, h:52},
+      spawnP1: {x:120, y:H-120},
+      spawnP2: {x:W-140, y:H-120},
+    },
+    // ── LEVEL 4: Key & Door + Pressure plate ──
+    {
+      name: "The Vault",
+      hint: "💡 One player grabs the KEY 🔑, the other stands on the PLATE — then reach the door together!",
+      bgColor: ['#FFF0FF','#FFF9F0'],
+      platforms: [
+        {x:0, y:H-40, w:W, h:40, type:'ground'},
+        {x:80, y:H-180, w:120, h:18, type:'platform'},
+        {x:W/2-90, y:H-40, w:180, h:40, type:'ground'},  // center island
+        {x:W/2-90, y:H-40, w:28, h:120, type:'wall'},    // left wall of island
+        {x:W/2+62, y:H-40, w:28, h:120, type:'wall'},    // right wall
+        {x:W-200, y:H-180, w:120, h:18, type:'platform'},
+        {x:W/2-60, y:H-280, w:120, h:18, type:'platform'},
+      ],
+      pressurePlates: [
+        {x:W-160, y:H-192, w:80, h:12, id:'B', active:false},
+      ],
+      gates: [
+        {x:W/2-14, y:H-200, w:28, h:160, id:'B', open:false},
+      ],
+      keys: [
+        {x:100, y:H-210, id:'K1', collected:false},
+      ],
+      doors: [
+        {x:W/2-24, y:H-320-8, w:48, h:52, keyId:'K1', open:false},
+      ],
+      exit: {x:W/2-30, y:H-320-52, w:60, h:52},
+      exitNeedsDoor: true,
+      spawnP1: {x:80, y:H-120},
+      spawnP2: {x:W-116, y:H-120},
+    },
+    // ── LEVEL 5: Combined challenge ──
+    {
+      name: "Grand Finale",
+      hint: "💡 Use everything you've learned — plates, keys, boosts! Coordinate every step!",
+      bgColor: ['#E8F5FF','#FFF0FF'],
+      platforms: [
+        {x:0, y:H-40, w:W, h:40, type:'ground'},
+        {x:60, y:H-160, w:100, h:18, type:'platform'},
+        {x:220, y:H-260, w:100, h:18, type:'platform'},
+        {x:W/2-60, y:H-360, w:120, h:18, type:'platform'},
+        {x:W-320, y:H-260, w:100, h:18, type:'platform'},
+        {x:W-160, y:H-160, w:100, h:18, type:'platform'},
+        {x:W/2-80, y:H-40, w:160, h:40, type:'ground'},   // center floor
+        {x:W/2-80, y:H-160, w:40, h:120, type:'wall'},
+        {x:W/2+40, y:H-160, w:40, h:120, type:'wall'},
+      ],
+      pressurePlates: [
+        {x:70, y:H-172, w:80, h:12, id:'C', active:false},
+        {x:W-150, y:H-172, w:80, h:12, id:'C', active:false},
+      ],
+      gates: [
+        {x:W/2-14, y:H-240, w:28, h:200, id:'C', open:false},
+      ],
+      keys: [
+        {x:230, y:H-290, id:'K2', collected:false},
+        {x:W-300, y:H-290, id:'K2', collected:false},
+      ],
+      doors: [
+        {x:W/2-24, y:H-400-8, w:48, h:52, keyId:'K2', open:false},
+      ],
+      exit: {x:W/2-30, y:H-400-52, w:60, h:52},
+      exitNeedsDoor: true,
+      boostZone: true,
+      spawnP1: {x:60, y:H-120},
+      spawnP2: {x:W-96, y:H-120},
+    },
+  ];
+  return JSON.parse(JSON.stringify(levels[idx]));
+}
+
+// ─── SPAWN ───
+function spawnPlayers() {
+  resize();
+  level = buildLevel(currentLevel);
+  p1 = new Player(1, COLORS.p1, COLORS.p1dark, level.spawnP1.x, level.spawnP1.y);
+  p2 = new Player(2, COLORS.p2, COLORS.p2dark, level.spawnP2.x, level.spawnP2.y);
+  document.getElementById('hudLevel').textContent = `Level ${currentLevel+1} / 5`;
+  document.getElementById('hudLevelName').textContent = level.name;
+  showTutorial(level.hint);
+}
+
+function showTutorial(msg) {
+  const el = document.getElementById('tutorialToast');
+  el.textContent = msg;
+  el.classList.remove('fade');
+  clearTimeout(tutorialTimer);
+  tutorialTimer = setTimeout(() => el.classList.add('fade'), 3500);
+}
+
+// ─── COLLISION ───
+function rectOverlap(ax,ay,aw,ah, bx,by,bw,bh) {
+  return ax < bx+bw && ax+aw > bx && ay < by+bh && ay+ah > by;
+}
+
+function resolvePlayerPlatform(player, platforms) {
+  player.onGround = false;
+  for (const plat of platforms) {
+    const px = plat.x, py = plat.y, pw = plat.w, ph = plat.h;
+    if (!rectOverlap(player.x, player.y, player.w, player.h, px, py, pw, ph)) continue;
+    // from top
+    if (player.vy >= 0 && player.y + player.h - player.vy <= py + 4) {
+      player.y = py - player.h;
+      player.vy = 0;
+      player.onGround = true;
+    } else if (player.vy < 0 && player.y - player.vy >= py + ph - 4) {
+      player.y = py + ph;
+      player.vy = 0;
+    } else if (player.vx > 0 && player.x + player.w - player.vx <= px + 4) {
+      player.x = px - player.w;
+      player.vx = 0;
+    } else if (player.vx < 0 && player.x - player.vx >= px + pw - 4) {
+      player.x = px + pw;
+      player.vx = 0;
+    }
+  }
+}
+
+function resolvePlayerOnPlayer(mover, other) {
+  if (!rectOverlap(mover.x, mover.y, mover.w, mover.h, other.x, other.y, other.w, other.h)) return false;
+  // mover landing on top of other
+  if (mover.vy >= 0 && mover.y + mover.h - mover.vy <= other.y + 6) {
+    mover.y = other.y - mover.h;
+    if (mover.vy > 0) mover.vy = 0;
+    mover.onGround = true;
+    return true;
+  }
+  return false;
+}
+
+// ─── JUMP-ON-TOP BOOST ───
+function checkBoostJump(jumper, platform) {
+  // If jumper jumps from on top of platform player, give extra height
+  // Already handled by normal jump; boost is just the higher jump force
+}
+
+// ─── UPDATE ───
+function update() {
+  if (!p1 || !p2) return;
+
+  // ── Player 1 controls (WASD) ──
+  let p1jumpPressed = keys['KeyW'] || keys['Space'];
+  if (keys['KeyA']) { p1.vx = -SPEED; p1.face = -1; }
+  else if (keys['KeyD']) { p1.vx = SPEED; p1.face = 1; }
+  else p1.vx *= 0.6;
+
+  if (p1jumpPressed && p1.onGround) {
+    // Check if jumping off p2
+    const onP2 = p1.y + p1.h >= p2.y - 2 && p1.y + p1.h <= p2.y + 8 &&
+                 p1.x + p1.w > p2.x && p1.x < p2.x + p2.w;
+    p1.vy = onP2 ? BOOST_JUMP : JUMP;
+    p1.wobble = 8;
+  }
+
+  // ── Player 2 controls (Arrows) ──
+  let p2jumpPressed = keys['ArrowUp'];
+  if (keys['ArrowLeft']) { p2.vx = -SPEED; p2.face = -1; }
+  else if (keys['ArrowRight']) { p2.vx = SPEED; p2.face = 1; }
+  else p2.vx *= 0.6;
+
+  if (p2jumpPressed && p2.onGround) {
+    const onP1 = p2.y + p2.h >= p1.y - 2 && p2.y + p2.h <= p1.y + 8 &&
+                 p2.x + p2.w > p1.x && p2.x < p1.x + p1.w;
+    p2.vy = onP1 ? BOOST_JUMP : JUMP;
+    p2.wobble = 8;
+  }
+
+  // Gravity
+  p1.vy += GRAVITY; p2.vy += GRAVITY;
+
+  // Move
+  p1.x += p1.vx; p1.y += p1.vy;
+  p2.x += p2.vx; p2.y += p2.vy;
+
+  // Wobble
+  if (p1.wobble > 0) p1.wobble--;
+  if (p2.wobble > 0) p2.wobble--;
+
+  // Walls
+  const clampX = (pl) => {
+    if (pl.x < 0) { pl.x = 0; pl.vx = 0; }
+    if (pl.x + pl.w > W) { pl.x = W - pl.w; pl.vx = 0; }
+  };
+  clampX(p1); clampX(p2);
+
+  // Build solid geometry
+  const solids = [...level.platforms];
+  // Add open-gate walls? no — gates block when closed
+  for (const gate of level.gates) {
+    if (!gate.open) solids.push({x:gate.x, y:gate.y, w:gate.w, h:gate.h});
+  }
+
+  // Platform collision
+  resolvePlayerPlatform(p1, solids);
+  resolvePlayerPlatform(p2, solids);
+
+  // Player-on-player
+  resolvePlayerOnPlayer(p1, p2);
+  resolvePlayerOnPlayer(p2, p1);
+
+  // Fall death → respawn
+  if (p1.y > H + 80) { p1.x = level.spawnP1.x; p1.y = level.spawnP1.y; p1.vx=0; p1.vy=0; p1.hasKey=false; resetLevel(); }
+  if (p2.y > H + 80) { p2.x = level.spawnP2.x; p2.y = level.spawnP2.y; p2.vx=0; p2.vy=0; p2.hasKey=false; resetLevel(); }
+
+  // ── Pressure plates ──
+  const plateGroups = {};
+  for (const plate of level.pressurePlates) {
+    const onPlate = (pl) => pl.bottom >= plate.y && pl.bottom <= plate.y + plate.h + 8 &&
+                            pl.x + pl.w > plate.x + 4 && pl.x < plate.x + plate.w - 4;
+    plate.active = onPlate(p1) || onPlate(p2);
+    if (!plateGroups[plate.id]) plateGroups[plate.id] = 0;
+    if (plate.active) plateGroups[plate.id]++;
+  }
+  // Count how many plates of each id exist
+  const plateCounts = {};
+  for (const plate of level.pressurePlates) {
+    plateCounts[plate.id] = (plateCounts[plate.id]||0)+1;
+  }
+  for (const gate of level.gates) {
+    const needed = plateCounts[gate.id] || 1;
+    gate.open = (plateGroups[gate.id]||0) >= needed;
+  }
+
+  // ── Key pickup ──
+  for (const key of level.keys) {
+    if (key.collected) continue;
+    if (rectOverlap(p1.x,p1.y,p1.w,p1.h, key.x-14,key.y-14,28,28)) { key.collected=true; p1.hasKey=true; }
+    if (rectOverlap(p2.x,p2.y,p2.w,p2.h, key.x-14,key.y-14,28,28)) { key.collected=true; p2.hasKey=true; }
+  }
+
+  // ── Door unlock ──
+  for (const door of level.doors) {
+    if (door.open) continue;
+    const hasMatchingKey = (p1.hasKey || p2.hasKey);
+    const nearDoor = rectOverlap(p1.x,p1.y,p1.w,p1.h,door.x,door.y,door.w,door.h) ||
+                     rectOverlap(p2.x,p2.y,p2.w,p2.h,door.x,door.y,door.w,door.h);
+    if (hasMatchingKey && nearDoor) {
+      door.open = true;
+      if (p1.hasKey) p1.hasKey = false;
+      if (p2.hasKey) p2.hasKey = false;
+    }
+  }
+
+  // ── Exit check ──
+  const ex = level.exit;
+  // If there are doors that need to be unlocked first
+  const doorBlocking = level.doors && level.doors.length > 0 && level.doors.some(d => !d.open);
+  const p1AtExit = rectOverlap(p1.x,p1.y,p1.w,p1.h, ex.x,ex.y,ex.w,ex.h);
+  const p2AtExit = rectOverlap(p2.x,p2.y,p2.w,p2.h, ex.x,ex.y,ex.w,ex.h);
+
+  if (p1AtExit && p2AtExit && !doorBlocking && !showingComplete) {
+    triggerLevelComplete();
+  }
+}
+
+function resetLevel() {
+  // Reset keys collected etc. but keep level structure
+  for (const key of level.keys) { key.collected = false; }
+  for (const door of level.doors) { door.open = false; }
+  p1.hasKey = false; p2.hasKey = false;
+}
+
+// ─── DRAW ───
+function draw() {
+  ctx.clearRect(0,0,W,H);
+
+  // Sky gradient
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0, level.bgColor[0]);
+  grad.addColorStop(1, level.bgColor[1]);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,W,H);
+
+  // Clouds (decorative)
+  drawClouds();
+
+  // Platforms
+  for (const plat of level.platforms) {
+    drawPlatform(plat);
+  }
+
+  // Gates
+  for (const gate of level.gates) {
+    if (!gate.open) {
+      drawGate(gate);
+    }
+  }
+
+  // Pressure Plates
+  for (const plate of level.pressurePlates) {
+    drawPressurePlate(plate);
+  }
+
+  // Keys
+  for (const key of level.keys) {
+    if (!key.collected) drawKey(key);
+  }
+
+  // Doors
+  for (const door of level.doors) {
+    if (!door.open) drawDoor(door);
+  }
+
+  // Exit
+  drawExit(level.exit);
+
+  // Players
+  drawPlayer(p2);
+  drawPlayer(p1);
+
+  // Key on player
+  if (p1.hasKey) drawFloatingKey(p1);
+  if (p2.hasKey) drawFloatingKey(p2);
+}
+
+let cloudOffset = 0;
+const cloudData = [
+  {x:0.1, y:0.1, s:1.0}, {x:0.3, y:0.05, s:0.7}, {x:0.55, y:0.08, s:1.2},
+  {x:0.7, y:0.04, s:0.8}, {x:0.88, y:0.12, s:0.9},
+];
+function drawClouds() {
+  cloudOffset = (cloudOffset + 0.1) % W;
+  ctx.save();
+  ctx.globalAlpha = 0.55;
+  for (const c of cloudData) {
+    const cx = ((c.x * W + cloudOffset) % W);
+    const cy = c.y * H;
+    const s = c.s;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 50*s, 22*s, 0, 0, Math.PI*2);
+    ctx.ellipse(cx-28*s, cy+6*s, 32*s, 16*s, 0, 0, Math.PI*2);
+    ctx.ellipse(cx+28*s, cy+6*s, 32*s, 16*s, 0, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawPlatform(p) {
+  const r = 8;
+  const isGround = p.type === 'ground';
+  const isWall = p.type === 'wall';
+  const topColor = isGround ? COLORS.ground : isWall ? COLORS.wall : COLORS.platform;
+  const botColor = isGround ? COLORS.groundDark : isWall ? COLORS.wallDark : COLORS.platformDark;
+
+  // Shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.12)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 4;
+
+  // Body
+  ctx.fillStyle = botColor;
+  ctx.beginPath();
+  ctx.roundRect(p.x, p.y+5, p.w, p.h, r);
+  ctx.fill();
+
+  ctx.fillStyle = topColor;
+  ctx.beginPath();
+  ctx.roundRect(p.x, p.y, p.w, p.h-3, r);
+  ctx.fill();
+  ctx.restore();
+
+  // Texture dots on ground
+  if (isGround && p.h > 20) {
+    ctx.save(); ctx.globalAlpha = 0.15;
+    ctx.fillStyle = '#fff';
+    for (let dx = p.x+20; dx < p.x+p.w-20; dx += 40) {
+      ctx.beginPath(); ctx.arc(dx, p.y+8, 5, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+function drawGate(gate) {
+  // Striped vertical gate
+  ctx.save();
+  ctx.fillStyle = COLORS.gate;
+  ctx.globalAlpha = 0.9;
+  ctx.beginPath();
+  ctx.roundRect(gate.x, gate.y, gate.w, gate.h, 4);
+  ctx.fill();
+  ctx.globalAlpha = 0.4;
+  ctx.fillStyle = '#fff';
+  for (let y = gate.y+8; y < gate.y+gate.h-8; y+=12) {
+    ctx.fillRect(gate.x+4, y, gate.w-8, 4);
+  }
+  ctx.restore();
+  // Lock icon
+  ctx.save();
+  ctx.font = '16px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🔒', gate.x+gate.w/2, gate.y+gate.h/2+6);
+  ctx.restore();
+}
+
+function drawPressurePlate(plate) {
+  const col = plate.active ? COLORS.plateActive : COLORS.plate;
+  ctx.save();
+  ctx.shadowColor = plate.active ? 'rgba(107,203,119,0.5)' : 'rgba(255,159,28,0.3)';
+  ctx.shadowBlur = plate.active ? 16 : 6;
+  ctx.fillStyle = col;
+  ctx.beginPath();
+  ctx.roundRect(plate.x, plate.y, plate.w, plate.h, 6);
+  ctx.fill();
+  // Label
+  ctx.font = 'bold 10px Nunito';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('▼', plate.x+plate.w/2, plate.y+10);
+  ctx.restore();
+}
+
+function drawKey(key) {
+  const t = Date.now()/600;
+  ctx.save();
+  ctx.translate(key.x, key.y + Math.sin(t)*4);
+  ctx.font = '26px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🔑', 0, 0);
+  ctx.restore();
+}
+
+function drawFloatingKey(pl) {
+  ctx.save();
+  ctx.font = '18px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🔑', pl.cx, pl.y - 14);
+  ctx.restore();
+}
+
+function drawDoor(door) {
+  // Door frame
+  ctx.save();
+  ctx.fillStyle = COLORS.doorDark;
+  ctx.beginPath();
+  ctx.roundRect(door.x-3, door.y, door.w+6, door.h+4, 8);
+  ctx.fill();
+  ctx.fillStyle = COLORS.door;
+  ctx.beginPath();
+  ctx.roundRect(door.x, door.y+3, door.w, door.h, 6);
+  ctx.fill();
+  // Lock
+  ctx.fillStyle = COLORS.keyDark;
+  ctx.beginPath();
+  ctx.arc(door.x+door.w/2, door.y+door.h/2, 8, 0, Math.PI*2);
+  ctx.fill();
+  ctx.font = '14px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🔑', door.x+door.w/2, door.y+door.h/2);
+  ctx.restore();
+}
+
+function drawExit(ex) {
+  const t = Date.now()/800;
+  // Glow
+  ctx.save();
+  ctx.shadowColor = COLORS.exit;
+  ctx.shadowBlur = 20 + Math.sin(t)*8;
+  // Door frame
+  ctx.fillStyle = COLORS.keyDark;
+  ctx.beginPath();
+  ctx.roundRect(ex.x-4, ex.y, ex.w+8, ex.h+6, 10);
+  ctx.fill();
+  ctx.fillStyle = COLORS.exit;
+  ctx.beginPath();
+  ctx.roundRect(ex.x, ex.y+4, ex.w, ex.h, 8);
+  ctx.fill();
+  // Stars
+  ctx.shadowBlur = 0;
+  ctx.font = '20px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('⭐', ex.x+ex.w/2, ex.y+ex.h/2 + Math.sin(t)*3);
+  // GOAL label above
+  ctx.font = 'bold 11px Nunito';
+  ctx.fillStyle = COLORS.keyDark;
+  ctx.textAlign = 'center';
+  ctx.fillText('GOAL', ex.x+ex.w/2, ex.y-10);
+  ctx.restore();
+}
+
+function drawPlayer(pl) {
+  const t = Date.now()/300;
+  const wobble = pl.wobble/8;
+  const scaleX = pl.onGround ? (1 + wobble * 0.1) : (1 - wobble * 0.05);
+  const scaleY = pl.onGround ? (1 - wobble * 0.1) : (1 + wobble * 0.05);
+
+  ctx.save();
+  ctx.translate(pl.cx, pl.cy);
+  ctx.scale(pl.face * scaleX, scaleY);
+
+  const r = pl.w/2;
+
+  // Shadow
+  ctx.save();
+  ctx.translate(0, r+4);
+  ctx.scale(1, 0.3);
+  ctx.globalAlpha = 0.15;
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+
+  // Body
+  ctx.shadowColor = pl.color;
+  ctx.shadowBlur = 12;
+  ctx.fillStyle = pl.color;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI*2);
+  ctx.fill();
+
+  // Shine
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  ctx.beginPath();
+  ctx.arc(-r*0.25, -r*0.3, r*0.4, 0, Math.PI*2);
+  ctx.fill();
+
+  // Eyes
+  const eyeY = pl.onGround ? -2 : -4;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(-7, eyeY, 6, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(7, eyeY, 6, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#2D3047';
+  const eyeShift = pl.vx * 0.5;
+  ctx.beginPath(); ctx.arc(-7+eyeShift, eyeY+1, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(7+eyeShift, eyeY+1, 3.5, 0, Math.PI*2); ctx.fill();
+  // Pupils shine
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(-5.5+eyeShift, eyeY-0.5, 1.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(8.5+eyeShift, eyeY-0.5, 1.2, 0, Math.PI*2); ctx.fill();
+
+  // Mouth (happy / open on jump)
+  ctx.strokeStyle = '#2D3047';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  if (!pl.onGround) {
+    // open mouth
+    ctx.arc(0, 6, 5, 0, Math.PI);
+  } else {
+    ctx.arc(0, 5, 5, 0.2, Math.PI-0.2);
+  }
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// ─── LEVEL COMPLETE ───
+function triggerLevelComplete() {
+  showingComplete = true;
+  spawnConfetti();
+  const msgs = [
+    "Great start, dream team! 🌟",
+    "Two plates, one goal — you nailed it! 🎯",
+    "Teamwork makes the dream work! 🚀",
+    "Vaultbreakers! The vault couldn't stop you! 💪",
+    "LEGENDARY DUO! You conquered all 5 levels! 🏆"
+  ];
+  document.getElementById('completeSub').textContent = msgs[currentLevel] || "Amazing!";
+
+  if (currentLevel >= 4) {
+    setTimeout(() => showScreen('winScreen'), 600);
+  } else {
+    setTimeout(() => showScreen('levelComplete'), 600);
+  }
+}
+
+function spawnConfetti() {
+  const emojis = ['⭐','🎉','✨','🌟','💫','🎊'];
+  for (let i = 0; i < 18; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-star';
+      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.left = Math.random()*100+'vw';
+      el.style.top = '-30px';
+      el.style.animationDuration = (0.8+Math.random()*0.8)+'s';
+      el.style.animationDelay = Math.random()*0.5+'s';
+      el.style.fontSize = (16+Math.random()*18)+'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2000);
+    }, i*60);
+  }
+}
+
+// ─── SCREENS ───
+function showScreen(id) {
+  ['titleScreen','levelComplete','winScreen'].forEach(s => {
+    document.getElementById(s).classList.add('hidden');
+  });
+  document.getElementById('gameWrapper').style.display = 'none';
+  if (id === 'game') {
+    document.getElementById('gameWrapper').style.display = '';
+  } else {
+    document.getElementById(id).classList.remove('hidden');
+  }
+}
+
+// ─── GAME LOOP ───
+let lastTime = 0;
+function loop(ts) {
+  const dt = ts - lastTime; lastTime = ts;
+  if (document.getElementById('gameWrapper').style.display !== 'none' && !showingComplete) {
+    update();
+    draw();
+  }
+  requestAnimationFrame(loop);
+}
+
+// ─── INIT ───
+document.getElementById('startBtn').onclick = () => {
+  currentLevel = 0;
+  showingComplete = false;
+  showScreen('game');
+  spawnPlayers();
+};
+
+document.getElementById('nextBtn').onclick = () => {
+  currentLevel++;
+  showingComplete = false;
+  showScreen('game');
+  spawnPlayers();
+};
+
+document.getElementById('replayBtn').onclick = () => {
+  currentLevel = 0;
+  showingComplete = false;
+  showScreen('titleScreen');
+};
+
+// Bubbles on title
+const deco = document.getElementById('titleDeco');
+const bubbleColors = ['#FF6B6B','#4ECDC4','#FFD166','#6BCB77','#C77DFF','#FFB347'];
+for (let i=0; i<18; i++) {
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  const size = 40+Math.random()*120;
+  b.style.cssText = `
+    width:${size}px; height:${size}px;
+    background:${bubbleColors[i%bubbleColors.length]};
+    left:${Math.random()*100}%;
+    animation-duration:${5+Math.random()*8}s;
+    animation-delay:${Math.random()*6}s;
+  `;
+  deco.appendChild(b);
+}
+
+window.addEventListener('resize', () => {
+  resize();
+  if (p1) spawnPlayers();
+});
+
+resize();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
