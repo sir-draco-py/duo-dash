@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/your-file-name.html"
+      "destination": "/duo-dash-current.html"
     }
   ]
 }
