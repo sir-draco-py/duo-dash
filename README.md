@@ -1,1 +1,1 @@
-A website based game inspired by Pico Park, built by only HTML, CSS, and JavaScript
+A 2D website based game inspired by a certain Action-Puzzle Game, built by only HTML, CSS, and JavaScript.
