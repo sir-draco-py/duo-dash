@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Duo Dash Destiny 🐱🐶</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231a1a2e'/><text y='44' x='6' font-size='48'>🐱</text><text y='34' x='28' font-size='28'>🐶</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:#0d0d1a;display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;user-select:none}
+#shell{position:relative;width:900px;height:560px;background:#1a1a2e;border-radius:20px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6),inset 0 0 0 4px rgba(255,255,255,.06);transition:transform 0.1s}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .3s,transform .3s;z-index:20;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
+#sTitle{background:linear-gradient(150deg,#241e3d 0%,#1a1a2e 100%)}
+.title-box{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border-radius:28px;padding:32px 48px;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,0.1);position:relative;z-index:1;width:520px}
+.logo{font-family:'Fredoka One',cursive;font-size:68px;line-height:1;background:linear-gradient(135deg,#FF6B6B,#FFD166,#4ECDC4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3))}
+.logo-sub{font-size:12px;font-weight:800;letter-spacing:4px;color:#a1c4fd;text-transform:uppercase;margin-bottom:24px}
+.level-grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;margin:16px 0}
+.lvl-btn{background:#2a2a40;border:2px solid #3a3a50;border-radius:12px;height:52px;color:#fff;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;transition:all 0.2s;position:relative}
+.lvl-btn:hover:not(:disabled){transform:translateY(-3px);background:#3a3a50;box-shadow:0 8px 20px rgba(0,0,0,0.3)}
+.lvl-btn:disabled{opacity:0.5;cursor:not-allowed;background:#1a1a2e}
+.lvl-btn.stage2{border-color:#5a2a1a;background:#2a1a0a}
+.lvl-btn.stage2:hover:not(:disabled){background:#3a2a1a;box-shadow:0 8px 20px rgba(255,80,0,0.2)}
+.lvl-btn.stage2:disabled{background:#1a0a00}
+.stage-divider{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:2px 0}
+.stage-divider-line{flex:1;height:1px;background:rgba(255,255,255,0.1)}
+.stage-divider-label{font-size:9px;font-weight:800;letter-spacing:2px;color:rgba(255,140,0,0.6);text-transform:uppercase;white-space:nowrap}
+.lvl-stars{font-size:10px;position:absolute;bottom:4px;width:100%;text-align:center;letter-spacing:1px}
+.btn-row{display:flex;gap:12px;justify-content:center;margin-top:20px}
+.btn{border:none;border-radius:50px;cursor:pointer;font-family:'Fredoka One',cursive;font-size:16px;padding:12px 30px;transition:0.15s;letter-spacing:1px;color:#fff}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.1)}.btn:active{transform:translateY(1px)}
+.btn-red{background:linear-gradient(135deg,#FF6B6B,#FF8E53);box-shadow:0 6px 0 #b43c3c,0 12px 24px rgba(255,107,107,.4)}
+.btn-teal{background:linear-gradient(135deg,#4ECDC4,#45B7D1);box-shadow:0 6px 0 #288ca0,0 12px 24px rgba(78,205,196,.4)}
+.btn-gray{background:#444;box-shadow:0 6px 0 #222}
+.btn-green{background:linear-gradient(135deg,#6BCB77,#4DA35C);box-shadow:0 6px 0 #32823c}
+#hud{position:absolute;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:15;background:rgba(26,26,46,.95);border-bottom:2px solid rgba(255,255,255,0.1);color:#fff}
+.hud-p{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border-radius:12px;padding:6px 14px;border:2px solid transparent}
+.hud-p.h1{border-color:rgba(255,107,107,0.3)}.hud-p.h2{border-color:rgba(78,205,196,0.3)}
+.hud-pnm{font-size:13px;font-weight:800}.h1 .hud-pnm{color:#FF6B6B}.h2 .hud-pnm{color:#4ECDC4}
+.hud-kl{font-size:10px;color:#888;font-weight:700}
+.hud-c{text-align:center;flex:1}
+.hud-lv{font-family:'Fredoka One',cursive;font-size:18px;color:#fff;line-height:1}
+.hud-ln{font-size:10px;color:#aaa;font-weight:700;text-transform:uppercase;letter-spacing:2px}
+.hud-icons{display:flex;gap:15px;align-items:center}
+.icon-btn{background:none;border:none;color:#aaa;font-size:24px;cursor:pointer;transition:0.2s}
+.icon-btn:hover{color:#fff;transform:scale(1.1)}
+.falls-txt{font-size:12px;font-weight:700;color:#ff8e53;display:flex;align-items:center;gap:4px}
+#gameCanvas{position:absolute;top:52px;left:0;width:900px;height:508px;display:block}
+#toast{position:absolute;bottom:24px;left:50%;transform:translateX(-50%) translateY(0);background:rgba(255,255,255,.95);color:#1a1a2e;border-radius:14px;padding:12px 24px;font-size:14px;font-weight:800;z-index:30;pointer-events:none;transition:all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+#toast.gone{opacity:0;transform:translateX(-50%) translateY(40px)}
+.cc{background:#1a1a2e;border:2px solid rgba(255,255,255,0.1);border-radius:26px;padding:40px 60px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:popIn .5s cubic-bezier(.34,1.56,.64,1);color:#fff;width:480px}
+@keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.cc-em{font-size:72px;margin-bottom:10px;filter:drop-shadow(0 10px 20px rgba(0,0,0,0.3))}
+.cc-title{font-family:'Fredoka One',cursive;font-size:42px;margin-bottom:8px;background:linear-gradient(135deg,#FFD166,#FF8E53);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cc-sub{font-size:14px;font-weight:700;color:#aaa;margin-bottom:24px}
+.cc-stats{background:rgba(0,0,0,0.3);border-radius:16px;padding:15px;margin-bottom:24px;display:flex;justify-content:space-around}
+.stat-box{text-align:center}
+.stat-val{font-size:24px;font-family:'Fredoka One',cursive;color:#FF6B6B}
+.stat-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px}
+.star-rating{font-size:32px;letter-spacing:5px;margin-bottom:20px;color:#444}
+.star-rating .earned{color:#FFD166;text-shadow:0 0 15px rgba(255,209,102,0.8)}
+#sPause{background:rgba(0,0,0,0.7);backdrop-filter:blur(5px)}
+.pause-menu{background:#1a1a2e;border:2px solid rgba(255,255,255,0.1);border-radius:24px;padding:40px;text-align:center;width:350px;animation:popIn 0.3s}
+.pause-title{font-family:'Fredoka One',cursive;font-size:36px;color:#fff;margin-bottom:30px}
+.pause-btns{display:flex;flex-direction:column;gap:15px}
+/* CONFETTI */
+.conf{position:fixed;pointer-events:none;animation:cF 1.5s ease-in forwards;z-index:999}
+@keyframes cF{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(640px) rotate(540deg);opacity:0}}
+
+/* EXTRA SCREENS */
+#sControls, #sLevels{background:linear-gradient(150deg,#241e3d 0%,#1a1a2e 100%)}
+.menu-overlay{background:rgba(255,255,255,.04);backdrop-filter:blur(12px);border-radius:28px;padding:28px 36px;box-shadow:0 16px 48px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,0.1);position:relative;z-index:1;width:820px;max-height:500px;overflow-y:auto}
+.menu-overlay::-webkit-scrollbar{width:6px}.menu-overlay::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:3px}.menu-overlay::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:3px}
+.overlay-title{font-family:'Fredoka One',cursive;font-size:32px;text-align:center;margin-bottom:4px;background:linear-gradient(135deg,#FF6B6B,#FFD166,#4ECDC4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.overlay-sub{text-align:center;font-size:11px;font-weight:800;letter-spacing:3px;color:#a1c4fd;text-transform:uppercase;margin-bottom:22px}
+
+/* CONTROLS PAGE */
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.ctrl-card{background:rgba(255,255,255,.06);border-radius:18px;padding:22px 28px;border:2px solid transparent;transition:transform 0.2s}
+.ctrl-card.p1-card{border-color:rgba(255,107,107,0.35);box-shadow:0 0 20px rgba(255,107,107,0.12)}
+.ctrl-card.p2-card{border-color:rgba(78,205,196,0.35);box-shadow:0 0 20px rgba(78,205,196,0.12)}
+.ctrl-avatar{font-size:48px;margin-bottom:6px;display:block;filter:drop-shadow(0 0 12px rgba(255,255,255,0.5))}
+.ctrl-name{font-family:'Fredoka One',cursive;font-size:22px;margin-bottom:2px}
+.p1-card .ctrl-name{color:#FF6B6B}.p2-card .ctrl-name{color:#4ECDC4}
+.ctrl-tag{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;opacity:0.6;color:#fff}
+.key-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.key-label{font-size:12px;font-weight:700;color:#aaa;width:80px}
+.keys{display:flex;gap:6px;align-items:center}
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;background:linear-gradient(180deg,#3a3a55 0%,#25253a 100%);border-radius:8px;border:2px solid rgba(255,255,255,0.18);border-bottom:3px solid rgba(0,0,0,0.5);font-family:'Fredoka One',cursive;font-size:14px;color:#fff;box-shadow:0 4px 8px rgba(0,0,0,0.4)}
+.kbd.wide{min-width:56px}
+.kbd-arr{font-size:12px}
+.p1-card .kbd{border-color:rgba(255,107,107,0.4);box-shadow:0 0 8px rgba(255,107,107,0.2),0 4px 8px rgba(0,0,0,0.4)}
+.p2-card .kbd{border-color:rgba(78,205,196,0.4);box-shadow:0 0 8px rgba(78,205,196,0.2),0 4px 8px rgba(0,0,0,0.4)}
+.ctrl-tip{text-align:center;font-size:12px;color:#888;font-weight:700;background:rgba(255,255,255,.04);border-radius:10px;padding:10px 16px;border:1px solid rgba(255,255,255,.07)}
+
+/* LEVEL PREVIEW PAGE */
+.lvl-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lvl-card{background:rgba(255,255,255,.05);border-radius:16px;padding:18px 20px;border:1px solid rgba(255,255,255,.1);transition:transform 0.2s,box-shadow 0.2s}
+.lvl-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.lvl-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.lvl-num{font-family:'Fredoka One',cursive;font-size:30px;line-height:1}
+.lvl-card-title{font-family:'Fredoka One',cursive;font-size:17px;color:#fff}
+.lvl-card-subtitle{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#aaa}
+.lvl-card-desc{font-size:12px;font-weight:700;color:#ccc;line-height:1.6}
+.lvl-card-hint{margin-top:10px;background:rgba(255,255,255,.05);border-radius:8px;padding:8px 12px;font-size:11px;color:#FFD166;font-weight:700;border-left:3px solid #FFD166}
+.lvl-card.l1{border-color:rgba(100,200,255,0.3)}.lvl-card.l2{border-color:rgba(255,160,78,0.3)}.lvl-card.l3{border-color:rgba(78,205,196,0.3)}.lvl-card.l4{border-color:rgba(200,120,255,0.3)}.lvl-card.l5{border-color:rgba(255,209,102,0.5);background:rgba(255,209,102,0.05)}
+.lvl-card-finale{grid-column:span 2}
+.lvl-badge{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:rgba(255,209,102,0.2);color:#FFD166;border:1px solid rgba(255,209,102,0.4);margin-left:auto}
+
+/* TITLE SCREEN EXTRAS */
+.stars-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.star-particle{position:absolute;border-radius:50%;animation:twinkle 3s infinite alternate}
+@keyframes twinkle{0%{opacity:0.2;transform:scale(0.8)}100%{opacity:0.9;transform:scale(1.2)}}
+
+/* HOME BUTTON LAYOUT */
+.home-btns{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.home-btn-primary{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;border:none;border-radius:16px;cursor:pointer;font-family:'Fredoka One',cursive;font-size:20px;letter-spacing:1px;color:#fff;transition:all 0.18s;position:relative;overflow:hidden}
+.home-btn-primary:hover{transform:translateY(-3px);filter:brightness(1.12)}
+.home-btn-primary:active{transform:translateY(1px);filter:brightness(0.95)}
+.home-btn-play{background:linear-gradient(135deg,#FF6B6B,#FF4E50,#FF8E53);box-shadow:0 7px 0 #b43030,0 14px 28px rgba(255,80,80,0.38)}
+.home-btn-play:hover{box-shadow:0 9px 0 #b43030,0 18px 34px rgba(255,80,80,0.5)}
+.home-btn-play:active{box-shadow:0 3px 0 #b43030}
+.home-btn-secondary-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.home-btn-sec{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border:none;border-radius:14px;cursor:pointer;font-family:'Fredoka One',cursive;font-size:16px;letter-spacing:0.5px;color:#fff;transition:all 0.18s}
+.home-btn-sec:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.home-btn-sec:active{transform:translateY(1px)}
+.home-btn-ctrl{background:linear-gradient(135deg,#4ECDC4,#2BB5AB);box-shadow:0 5px 0 #1e8a82,0 10px 20px rgba(78,205,196,0.3)}
+.home-btn-ctrl:hover{box-shadow:0 7px 0 #1e8a82,0 14px 28px rgba(78,205,196,0.45)}
+.home-btn-ctrl:active{box-shadow:0 2px 0 #1e8a82}
+.home-btn-lvl{background:linear-gradient(135deg,#7C6AF7,#9B8BFF);box-shadow:0 5px 0 #4b3db8,0 10px 20px rgba(124,106,247,0.35)}
+.home-btn-lvl:hover{box-shadow:0 7px 0 #4b3db8,0 14px 28px rgba(124,106,247,0.5)}
+.home-btn-lvl:active{box-shadow:0 2px 0 #4b3db8}
+.home-btn-reset{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:9px 20px;border:2px solid rgba(255,255,255,0.13);border-radius:12px;cursor:pointer;font-family:'Fredoka One',cursive;font-size:14px;color:rgba(255,255,255,0.45);background:rgba(255,255,255,0.04);transition:all 0.18s}
+.home-btn-reset:hover{background:rgba(255,80,80,0.1);border-color:rgba(255,80,80,0.35);color:rgba(255,130,130,0.85);transform:translateY(-1px)}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- TITLE & LEVEL SELECT -->
+<div class="screen" id="sTitle">
+  <div class="stars-bg" id="starsBg"></div>
+  <div class="title-box">
+    <div class="logo">Duo Dash Destiny</div>
+    <div class="logo-sub">Co-op Temple Adventure</div>
+    
+    <div id="levelSelectGrid" class="level-grid">
+      <!-- Generated by JS -->
+    </div>
+
+    <div class="home-btns">
+      <button class="home-btn-primary home-btn-play" id="btnSt">
+        <span>🚀</span> Play
+      </button>
+      <div class="home-btn-secondary-row">
+        <button class="home-btn-sec home-btn-ctrl" id="btnControls">🎮 Game Controls</button>
+        <button class="home-btn-sec home-btn-lvl" id="btnLevels">📖 Level Preview</button>
+      </div>
+      <button class="home-btn-reset" id="btnReset">🗑️ Reset Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME CONTROLS SCREEN -->
+<div class="screen hidden" id="sControls">
+  <div class="menu-overlay">
+    <div class="overlay-title">🎮 Game Controls</div>
+    <div class="overlay-sub">How to play Duo Dash Destiny</div>
+    <div class="ctrl-grid">
+      <!-- Player 1 -->
+      <div class="ctrl-card p1-card">
+        <span class="ctrl-avatar">🐱</span>
+        <div class="ctrl-name">Mochi</div>
+        <div class="ctrl-tag">Player 1</div>
+        <div class="key-row">
+          <div class="key-label">Jump</div>
+          <div class="keys"><span class="kbd">W</span></div>
+        </div>
+        <div class="key-row">
+          <div class="key-label">Move</div>
+          <div class="keys">
+            <span class="kbd">A</span>
+            <span class="kbd">D</span>
+            <span style="font-size:11px;color:#888;font-weight:700;">Left / Right</span>
+          </div>
+        </div>
+      </div>
+      <!-- Player 2 -->
+      <div class="ctrl-card p2-card">
+        <span class="ctrl-avatar">🐶</span>
+        <div class="ctrl-name">Biscuit</div>
+        <div class="ctrl-tag">Player 2</div>
+        <div class="key-row">
+          <div class="key-label">Jump</div>
+          <div class="keys"><span class="kbd"><span class="kbd-arr">↑</span></span></div>
+        </div>
+        <div class="key-row">
+          <div class="key-label">Move</div>
+          <div class="keys">
+            <span class="kbd"><span class="kbd-arr">←</span></span>
+            <span class="kbd"><span class="kbd-arr">→</span></span>
+            <span style="font-size:11px;color:#888;font-weight:700;">Left / Right</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ctrl-tip">
+      💡 <strong>Boost Jump:</strong> Stand still as one player, let the other jump on top of you, then jump again — they'll rocket upwards!<br>
+      ⏸️ <strong>Pause:</strong> Press <span class="kbd" style="display:inline-flex;font-size:11px;padding:2px 8px;height:22px;">ESC</span> &nbsp;|&nbsp; 🔊 <strong>Mute:</strong> Press <span class="kbd" style="display:inline-flex;font-size:11px;padding:2px 8px;height:22px;">M</span>
+    </div>
+    <div class="btn-row" style="margin-top:18px">
+      <button class="btn btn-teal" id="btnControlsBack">← Back to Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL PREVIEW SCREEN -->
+<div class="screen hidden" id="sLevels">
+  <div class="menu-overlay">
+    <div class="overlay-title">📖 Level Preview</div>
+    <div class="overlay-sub">10 Temples Await</div>
+
+    <div style="font-size:10px;font-weight:800;letter-spacing:3px;color:#a1c4fd;text-transform:uppercase;margin-bottom:10px;text-align:center;">⭐ Stage 1 — Temple Ruins</div>
+    <div class="lvl-cards">
+      <div class="lvl-card l1">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#64c8ff">1</div>
+          <div><div class="lvl-card-title">Hello, Temple!</div><div class="lvl-card-subtitle">Simple Intro</div></div>
+        </div>
+        <div class="lvl-card-desc">Each player climbs their own separate staircase on opposite sides of the temple. Simple, breezy intro to get you warmed up!</div>
+        <div class="lvl-card-hint">🎯 Meet your partner at the top exit ⭐</div>
+      </div>
+      <div class="lvl-card l2">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#ffa04e">2</div>
+          <div><div class="lvl-card-title">Push &amp; Pull</div><div class="lvl-card-subtitle">Pressure Plates</div></div>
+        </div>
+        <div class="lvl-card-desc">P2 stands on the right plate to open the gate for P1. P1 climbs up and steps on the upper plate to open the gate for P2.</div>
+        <div class="lvl-card-hint">🎯 Both plates must be triggered in sequence</div>
+      </div>
+      <div class="lvl-card l3">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#4ECDC4">3</div>
+          <div><div class="lvl-card-title">Lift Me Up!</div><div class="lvl-card-subtitle">Boost Jump</div></div>
+        </div>
+        <div class="lvl-card-desc">The high ledge is too tall for a normal jump! P2 stands in the BOOST ZONE. P1 jumps onto P2 then jumps again to rocket up.</div>
+        <div class="lvl-card-hint">🚀 Boost jump = jump on partner, then jump again!</div>
+      </div>
+      <div class="lvl-card l4">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#c878ff">4</div>
+          <div><div class="lvl-card-title">The Vault</div><div class="lvl-card-subtitle">Keys &amp; Doors</div></div>
+        </div>
+        <div class="lvl-card-desc">P1 holds the plate to open the center gate. P2 grabs the key from the right platform, walks through the gate, and unlocks the door.</div>
+        <div class="lvl-card-hint">🔑 Teamwork and timing is everything here</div>
+      </div>
+      <div class="lvl-card l5 lvl-card-finale">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#FFD166">5</div>
+          <div><div class="lvl-card-title">Grand Finale</div><div class="lvl-card-subtitle">Ultimate Challenge</div></div>
+          <div class="lvl-badge">STAGE 1 BOSS</div>
+        </div>
+        <div class="lvl-card-desc">P2 holds still in the BOOST ZONE so P1 can boost up to grab the key on the high shelf. P2 then moves to open the gate. P1 brings the key through. Both race to the top! 🏆</div>
+        <div class="lvl-card-hint">🏆 The ultimate test of coordination — don't give up!</div>
+      </div>
+    </div>
+
+    <div style="font-size:10px;font-weight:800;letter-spacing:3px;color:#FF8C00;text-transform:uppercase;margin:18px 0 10px;text-align:center;">⚠️ Stage 2 — Underground Ruins</div>
+    <div class="lvl-cards">
+      <div class="lvl-card" style="border-color:rgba(255,80,0,0.35)">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#FF6B3D">6</div>
+          <div><div class="lvl-card-title">Mind the Gap</div><div class="lvl-card-subtitle">Launch Pads + Holes</div></div>
+        </div>
+        <div class="lvl-card-desc">A wide deadly hole splits the arena. One high center platform is the only exit — too far and too high for a normal jump. Step on a LAUNCH PAD at the edge to claim it and super-jump across. Both players must land on the center platform together.</div>
+        <div class="lvl-card-hint" style="border-color:#FF8C00;color:#FF8C00">🚀 First to step on a pad claims it — coordinate who jumps when!</div>
+      </div>
+      <div class="lvl-card" style="border-color:rgba(180,0,255,0.35)">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#CC44FF">7</div>
+          <div><div class="lvl-card-title">Island Hopping</div><div class="lvl-card-subtitle">Scrolling World</div></div>
+        </div>
+        <div class="lvl-card-desc">The world stretches wide — four islands separated by deadly chasms. Use launch pads to hop across. P2 must reach island 3 and press the plate to open P1's path. Then both climb to the exit on island 4.</div>
+        <div class="lvl-card-hint" style="border-color:#CC44FF;color:#CC44FF">🏝️ First scrolling level — the camera follows both players!</div>
+      </div>
+      <div class="lvl-card" style="border-color:rgba(0,200,100,0.35)">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#00CC66">8</div>
+          <div><div class="lvl-card-title">Bridge Builder</div><div class="lvl-card-subtitle">Ghost Bridge</div></div>
+        </div>
+        <div class="lvl-card-desc">A massive chasm can only be crossed via a ghost bridge — but it only appears while the plate is held. P2 must boost over a smaller gap first, reach the plate, and hold it while P1 crosses the bridge.</div>
+        <div class="lvl-card-hint" style="border-color:#00CC66;color:#00CC66">🌉 The bridge disappears the moment the plate is released!</div>
+      </div>
+      <div class="lvl-card" style="border-color:rgba(150,0,255,0.35)">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#9900FF">9</div>
+          <div><div class="lvl-card-title">Key Across the Void</div><div class="lvl-card-subtitle">Keys &amp; Chasms</div></div>
+        </div>
+        <div class="lvl-card-desc">A key sits on an isolated island, holes on both sides. P1 holds the gate plate for P2's return. P2 leaps to the key island, grabs it, and must navigate back carrying the key to unlock the door.</div>
+        <div class="lvl-card-hint" style="border-color:#9900FF;color:#9900FF">🔑 Drop the key in a hole and it resets — don't fall!</div>
+      </div>
+      <div class="lvl-card lvl-card-finale" style="border-color:rgba(255,50,0,0.5);background:rgba(255,50,0,0.05)">
+        <div class="lvl-card-header">
+          <div class="lvl-num" style="color:#FF3300">10</div>
+          <div><div class="lvl-card-title">Grand Canyon</div><div class="lvl-card-subtitle">Stage 2 Finale</div></div>
+          <div class="lvl-badge" style="border-color:rgba(255,80,0,0.6);color:#FF8C00;background:rgba(255,80,0,0.15)">STAGE 2 BOSS</div>
+        </div>
+        <div class="lvl-card-desc">Three massive chasms. Launch pads, a ghost bridge, partner boost — all in one brutal finale. Grab the key past the gate, unlock the door, and race to the very top. This is everything you've learned. 🔥</div>
+        <div class="lvl-card-hint" style="border-color:#FF3300;color:#FF8C00">🔥 The hardest level in the game — coordination is survival!</div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:18px">
+      <button class="btn btn-teal" id="btnLevelsBack">← Back to Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud" style="display:none;">
+  <div class="hud-p h1">
+    <div class="hud-av">🐱</div>
+    <div class="hud-info"><div class="hud-pnm">Mochi</div><div class="hud-kl">W / A / D</div></div>
+    <div class="falls-txt">💀 <span id="fallsP1">0</span></div>
+  </div>
+  <div class="hud-c">
+    <div class="hud-lv" id="hudLv">Level 1</div>
+    <div class="hud-ln" id="hudNm">—</div>
+  </div>
+  <div class="hud-icons">
+    <button class="icon-btn" id="btnPause" title="Pause (ESC)">⏸️</button>
+    <button class="icon-btn" id="btnMute" title="Mute (M)">🔊</button>
+  </div>
+  <div class="hud-p h2">
+    <div class="falls-txt"><span id="fallsP2">0</span> 💀</div>
+    <div class="hud-info" style="text-align:right"><div class="hud-pnm">Biscuit</div><div class="hud-kl">↑ / ← / →</div></div>
+    <div class="hud-av">🐶</div>
+  </div>
+</div>
+
+<!-- CANVAS -->
+<canvas id="gameCanvas" width="900" height="508" style="display:none;"></canvas>
+
+<!-- TOAST -->
+<div id="toast" class="gone"></div>
+
+<!-- PAUSE OVERLAY -->
+<div class="screen hidden" id="sPause">
+  <div class="pause-menu">
+    <div class="pause-title">PAUSED</div>
+    <div class="pause-btns">
+      <button class="btn btn-teal" id="pdResume">▶️ Resume</button>
+      <button class="btn btn-gray" id="pdRetry">🔄 Restart Level</button>
+      <button class="btn btn-red" id="pdHome">🏠 Quit to Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL COMPLETE -->
+<div class="screen hidden" id="sComplete">
+  <div class="cc">
+    <div class="cc-em" id="ccEm">🎉</div>
+    <div class="cc-title" id="ccTitle">Level Cleared!</div>
+    <div class="cc-sub" id="ccSu">Amazing teamwork!</div>
+    
+    <div class="star-rating" id="ccStars">
+      <span>★</span><span>★</span><span>★</span>
+    </div>
+
+    <div class="cc-stats">
+      <div class="stat-box">
+        <div class="stat-val" id="ccF1">0</div>
+        <div class="stat-lbl">Mochi Fails</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="ccF2">0</div>
+        <div class="stat-lbl">Biscuit Fails</div>
+      </div>
+    </div>
+    
+    <div class="btn-row" style="margin-top:0">
+      <button class="btn btn-gray" id="cBtnHome">🏠 Menu</button>
+      <button class="btn btn-green" id="cBtnNext">Next Level 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- WIN COMPLETE GAME -->
+<div class="screen hidden" id="sWin">
+  <div class="cc" style="width:540px; border-color:#FFD166; background:#2e1b2e">
+    <div class="cc-em">🏆</div>
+    <div class="cc-title" style="font-size:48px;">Legendary Escapers!</div>
+    <div class="cc-sub" style="color:#FFD166; font-size:16px;">You've conquered all 10 levels across 2 stages!</div>
+    <div style="font-size:14px; margin-bottom:30px; line-height:1.6">
+      Mochi and Biscuit have finally made it out thanks to your incredible teamwork. 
+      Thank you for playing!<br><br>
+      <strong>Total Fails Across All Levels:</strong> <span style="color:#FF6B6B; font-weight:800; font-size:20px" id="ccTotalFails">0</span> 💀
+    </div>
+    <div class="btn-row" style="margin-top:0">
+      <button class="btn btn-teal" id="wBtnHome">🏠 Main Menu</button>
+      <button class="btn btn-red" id="wBtnPlay">🔄 Play Again</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /shell -->
+
+<script>
+// ═══════════════════════════════════════════════
+// GAME STATE & CONSTANTS
+// ═══════════════════════════════════════════════
+const GW=900, GH=508, F=468;
+const GRAV=0.52, JFORCE=-14.0, BOOST=-19.0, SPD=5.0;
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let p1, p2, lvl, curLvl=0, completing=false, paused=false, shake=0;
+let fallsCount1=0, fallsCount2=0;
+let cameraX=0;
+
+// Inputs
+const keys={}, justPressed={};
+const GAME_KEYS=new Set(['KeyW','KeyA','KeyD','ArrowUp','ArrowLeft','ArrowRight','Escape','KeyM']);
+window.addEventListener('keydown', e => {
+  if(!keys[e.code]) justPressed[e.code] = true;
+  keys[e.code] = true;
+  if(GAME_KEYS.has(e.code) && document.getElementById('gameCanvas').style.display !== 'none'){
+    e.preventDefault();
+  }
+});
+window.addEventListener('keyup', e => {
+  keys[e.code] = false;
+  if(GAME_KEYS.has(e.code) && document.getElementById('gameCanvas').style.display !== 'none'){
+    e.preventDefault();
+  }
+});
+
+// Progression
+let save = JSON.parse(localStorage.getItem('duoDashV2')) || { unlocked: 1, stars: {} };
+function saveProgress() { localStorage.setItem('duoDashV2', JSON.stringify(save)); }
+
+// ═══════════════════════════════════════════════
+// AUDIO SYNTHESIS (Web Audio API)
+// ═══════════════════════════════════════════════
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let actx;
+let isMuted = false;
+
+function initAudio() {
+  if(!actx) actx = new AudioContext();
+  if(actx.state === 'suspended') actx.resume();
+}
+
+function playTone(freq, type, dur, volStr=0.1, slideFreq=null) {
+  if(isMuted || !actx) return;
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, actx.currentTime);
+  if(slideFreq) osc.frequency.exponentialRampToValueAtTime(slideFreq, actx.currentTime + dur);
+  gain.gain.setValueAtTime(volStr, actx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + dur);
+  osc.connect(gain);
+  gain.connect(actx.destination);
+  osc.start();
+  osc.stop(actx.currentTime + dur);
+}
+
+const sfx = {
+  jump: () => playTone(300, 'sine', 0.2, 0.15, 600),
+  boost: () => { playTone(150, 'square', 0.3, 0.1, 800); playTone(400, 'sine', 0.3, 0.1, 1000); },
+  land: () => playTone(80, 'triangle', 0.1, 0.2, 40),
+  key: () => { playTone(800, 'sine', 0.1, 0.1); setTimeout(()=>playTone(1200, 'sine', 0.2, 0.1), 100); },
+  door: () => { playTone(400, 'square', 0.1, 0.1); setTimeout(()=>playTone(600, 'square', 0.3, 0.15), 100); },
+  fall: () => playTone(400, 'sawtooth', 0.5, 0.15, 50),
+  win: () => {
+    [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+      setTimeout(() => playTone(f, 'square', 0.2, 0.1), i * 120);
+    });
+  }
+};
+
+document.getElementById('btnMute').onclick = () => {
+  isMuted = !isMuted;
+  document.getElementById('btnMute').textContent = isMuted ? '🔇' : '🔊';
+};
+
+// ═══════════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════════
+let particles = [];
+function spawnGfx(x, y, type, color, amount) {
+  for(let i=0; i<amount; i++) {
+    particles.push({
+      x: x, y: y,
+      vx: (Math.random()-0.5)*4,
+      vy: type==='dust' ? Math.random()*-2 : (Math.random()-0.5)*4,
+      life: 1.0, decay: Math.random()*0.05 + 0.02,
+      c: color, s: Math.random()*4 + 2, type: type
+    });
+  }
+}
+
+function updateParticles() {
+  for(let i=particles.length-1; i>=0; i--) {
+    let p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.life -= p.decay;
+    if(p.type === 'dust') { p.vy += 0.1; p.s *= 0.95; }
+    if(p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+function drawParticles() {
+  particles.forEach(p => {
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.fillStyle = p.c;
+    ctx.beginPath();
+    if(p.type === 'star') {
+      ctx.arc(p.x, p.y, p.s, 0, Math.PI*2);
+    } else {
+      ctx.fillRect(p.x - p.s/2, p.y - p.s/2, p.s, p.s);
+    }
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1.0;
+}
+
+// ═══════════════════════════════════════════════
+// LEVEL DATA
+// ═══════════════════════════════════════════════
+const LEVELS = [
+  {
+    name: 'Hello, Temple!',
+    bg: ['#1c203b', '#2a1b38'],
+    platforms: [
+      {x:0, y:F, w:900, h:40, s:'ground'},
+      {x:55, y:F-95, w:130,h:16, s:'plat'}, {x:195,y:F-185,w:130,h:16, s:'plat'},
+      {x:715, y:F-95, w:130,h:16, s:'plat'},{x:575,y:F-185,w:130,h:16, s:'plat'},
+      {x:345,y:F-275,w:210,h:16, s:'plat'},
+    ],
+    plates:[], gates:[], ghosts:[], keys:[], doors:[],
+    exit:{x:345,y:F-275-52,w:210,h:60},
+    sp1:{x:50,y:F-60}, sp2:{x:810,y:F-60},
+    msgs: [
+      '🏛️ Welcome! Both must reach ⭐ EXIT.',
+      '🐱 Mochi: W/A/D   🐶 Biscuit: Arrow keys.',
+      '💡 Climb your stairs and meet at the top!'
+    ]
+  },
+  {
+    name: 'Push & Pull',
+    bg: ['#2e1b2e', '#1c1b33'],
+    platforms: [
+      {x:0, y:F, w:250, h:40, s:'ground'}, {x:272,y:F, w:356, h:40, s:'ground'}, {x:650,y:F, w:250, h:40, s:'ground'},
+      {x:250,y:F-340,w:22,h:200, s:'wall'}, {x:628,y:F-340,w:22,h:200, s:'wall'},
+      {x:316,y:F-120,w:268,h:16, s:'plat'}, {x:322,y:F-255,w:256,h:16, s:'plat'},
+    ],
+    plates: [
+      {x:670,y:F-16,w:110,h:16,gateId:'GL',active:false},
+      {x:326,y:F-136,w:230,h:16,gateId:'GR',active:false},
+    ],
+    gates: [
+      {x:250,y:F-145,w:22,h:145,id:'GL',open:false},
+      {x:628,y:F-145,w:22,h:145,id:'GR',open:false},
+    ],
+    ghosts:[], keys:[], doors:[],
+    exit:{x:374,y:F-255-58,w:152,h:58},
+    sp1:{x:50,y:F-60}, sp2:{x:800,y:F-60},
+    msgs: ['💡 P2: Step on ORANGE PLATE (right) to open gate!', '💡 P1: Climb up, step on UPPER PLATE for P2!']
+  },
+  {
+    name: 'Lift Me Up!',
+    bg: ['#1a2a3a', '#101a24'],
+    platforms: [
+      {x:0, y:F, w:900, h:40, s:'ground'},
+      {x:80, y:F-260,w:250,h:16, s:'plat'},
+      {x:600,y:F-130,w:160,h:16, s:'plat'},
+      {x:620,y:F-260,w:200,h:16, s:'plat'},
+    ],
+    plates: [{x:100,y:F-276,w:200,h:16,gateId:'GP3',active:false}],
+    ghosts: [{x:330,y:F-260,w:290,h:16,plateId:'GP3'}],
+    gates:[], keys:[], doors:[],
+    exit:{x:100,y:F-260-58,w:150,h:58},
+    boostZoneX:0, boostZoneW:220,
+    sp1:{x:50,y:F-60}, sp2:{x:810,y:F-60},
+    msgs: [
+      '💡 P2: Step into the BOOST ZONE (left edge) and wait.',
+      '💡 P1: Jump from P2 to the high platform and activate the bridge!',
+      '💡 P2: Use the lower stairs to cross the bridge.'
+    ]
+  },
+  {
+    name: 'The Vault',
+    bg: ['#2c1533', '#19152b'],
+    platforms: [
+      {x:0, y:F, w:900, h:40, s:'ground'},
+      {x:0, y:F-145,w:180,h:16, s:'plat'}, {x:424,y:F-400,w:22,h:255, s:'wall'},
+      {x:720,y:F-145,w:180,h:16, s:'plat'},
+      {x:300,y:F-145,w:120,h:16, s:'plat'}, {x:480,y:F-145,w:120,h:16, s:'plat'},
+      {x:90, y:F-285,w:810,h:16, s:'plat'},
+    ],
+    plates: [{x:55,y:F-161,w:80,h:16,gateId:'GV',active:false}],
+    gates: [{x:424,y:F-145,w:22,h:145,id:'GV',open:false}],
+    keys: [{x:800,y:F-165,id:'K1',got:false}],
+    doors: [{x:0,y:F-285,w:90,h:16,keyId:'K1',open:false,isBlocking:true}],
+    ghosts:[],
+    exit:{x:400,y:F-285-58,w:150,h:58},
+    sp1:{x:50,y:F-60}, sp2:{x:820,y:F-60},
+    msgs: [
+      '💡 P1: Step on plate. P2: Grab Key.',
+      '💡 P2: Unlock TRAPDOOR above to let P1 up!'
+    ]
+  },
+  {
+    name: 'Grand Finale',
+    bg: ['#2e0c1f', '#100b1a'],
+    platforms: [
+      {x:0, y:F, w:900, h:40, s:'ground'},
+      {x:180,y:F-295,w:580,h:16, s:'plat'},
+      {x:680,y:F-130,w:175,h:16, s:'plat'},
+    ],
+    plates: [{x:200,y:F-311,w:200,h:16,gateId:'GP5',active:false}],
+    gates:[],
+    ghosts: [{x:650,y:F-220,w:210,h:16,plateId:'GP5'}],
+    keys: [{x:755,y:F-244,id:'K5',got:false}],
+    doors: [{x:530,y:F-295-62,w:52,h:62,keyId:'K5',open:false,isBlocking:false}],
+    exit:{x:195,y:F-295-58,w:170,h:58},
+    boostZoneX:700, boostZoneW:200,
+    sp1:{x:50,y:F-60}, sp2:{x:840,y:F-60},
+    msgs: [
+      '🏆 GRAND FINALE! P2: Boost P1 on the FAR RIGHT.',
+      '💡 P1: Open Bridge. P2: Grab Key, Open Door. EXIT!'
+    ]
+  },
+
+  // ── STAGE 2: UNDERGROUND RUINS ──────────────────
+  {
+    // Level 6 — Mind the Gap
+    // Pure intro: hole in the ground, one high center platform, two launch pads.
+    // Normal jump can't reach — must use launch pad to leap across and up.
+    // Both players need to land on the same center platform to trigger exit.
+    name: 'Mind the Gap',
+    bg: ['#1a0a00', '#2d0f00'],
+    worldWidth: 900,
+    platforms: [
+      {x:0,   y:F, w:330, h:40, s:'ground'},  // Left ground
+      {x:570, y:F, w:330, h:40, s:'ground'},  // Right ground — gap 330–570 (death)
+      // Single center target platform — high up, only reachable via launch pad
+      {x:350, y:F-280, w:200, h:16, s:'plat'},
+    ],
+    launchPads: [
+      {x:255, y:F-16, w:75, h:16, occupied:null},  // Left pad — at the edge of left ground
+      {x:570, y:F-16, w:75, h:16, occupied:null},  // Right pad — at the edge of right ground
+    ],
+    plates:[], gates:[], ghosts:[], keys:[], doors:[],
+    exit:{x:355, y:F-280-58, w:190, h:58},
+    sp1:{x:80,  y:F-60},
+    sp2:{x:760, y:F-60},
+    msgs:[
+      '⚠️ Stage 2! The hole kills — fall in and you respawn!',
+      '🚀 LAUNCH PADS give a super jump — step on one to claim it!',
+      '💡 Both players must reach the center platform to exit!'
+    ]
+  },
+  {
+    // Level 7 — Island Hopping
+    name: 'Island Hopping',
+    bg: ['#0a0014', '#14002a'],
+    worldWidth: 1400,
+    platforms: [
+      {x:0,   y:F, w:260, h:40, s:'ground'},
+      {x:360, y:F, w:220, h:40, s:'ground'},
+      {x:700, y:F, w:220, h:40, s:'ground'},
+      {x:1050,y:F, w:350, h:40, s:'ground'},
+      {x:20,  y:F-130, w:100, h:16, s:'plat'},
+      {x:140, y:F-240, w:100, h:16, s:'plat'},
+      {x:380, y:F-130, w:90,  h:16, s:'plat'},
+      {x:730, y:F-130, w:90,  h:16, s:'plat'},
+      {x:1070,y:F-130, w:120, h:16, s:'plat'},
+      {x:1200,y:F-240, w:130, h:16, s:'plat'},
+    ],
+    plates: [{x:740, y:F-16, w:80, h:16, gateId:'G7', active:false}],
+    gates: [{x:238, y:F-240, w:22, h:240, id:'G7', open:false}],
+    ghosts:[], keys:[], doors:[],
+    exit:{x:1100, y:F-240-58, w:210, h:58},
+    sp1:{x:40,  y:F-60},
+    sp2:{x:160, y:F-60},
+    msgs:[
+      '🏝️ Island Hopping! The gaps are deadly — jump carefully!',
+      '💡 P2: Reach island 3, step on PLATE to open P1\'s gate!',
+      '💡 Both reach island 4 and climb to EXIT!'
+    ]
+  },
+  {
+    // Level 8 — The Bridge Builder
+    name: 'The Bridge Builder',
+    bg: ['#001a0a', '#002a14'],
+    worldWidth: 1400,
+    platforms: [
+      {x:0,   y:F, w:340, h:40, s:'ground'},
+      {x:50,  y:F-120, w:130, h:16, s:'plat'},
+      {x:170, y:F-230, w:150, h:16, s:'plat'},
+      {x:480, y:F, w:260, h:40, s:'ground'},
+      {x:510, y:F-130, w:100, h:16, s:'plat'},
+      {x:1000,y:F, w:400, h:40, s:'ground'},
+      {x:1020,y:F-130, w:130, h:16, s:'plat'},
+      {x:1160,y:F-250, w:200, h:16, s:'plat'},
+      {x:1060,y:F-370, w:260, h:16, s:'plat'},
+    ],
+    plates: [{x:1050, y:F-16, w:80, h:16, gateId:'G8', active:false}],
+    ghosts: [{x:740, y:F-16, w:260, h:16, plateId:'G8'}],
+    gates:[], keys:[], doors:[],
+    exit:{x:1070, y:F-370-58, w:250, h:58},
+    sp1:{x:40,  y:F-60},
+    sp2:{x:160, y:F-60},
+    msgs:[
+      '🌉 Bridge Builder! The big gap only has a bridge when the plate is held.',
+      '💡 Both jump the small left gap → P2 climbs up → holds PLATE for bridge!',
+      '💡 P1: Cross the bridge → both climb to EXIT!'
+    ]
+  },
+  {
+    // Level 9 — Key Across the Void
+    name: 'Key Across the Void',
+    bg: ['#0f001a', '#1a0030'],
+    worldWidth: 1600,
+    platforms: [
+      {x:0,   y:F, w:280, h:40, s:'ground'},
+      {x:20,  y:F-130, w:120, h:16, s:'plat'},
+      {x:20,  y:F-280, w:170, h:16, s:'plat'},
+      {x:480, y:F, w:200, h:40, s:'ground'},
+      {x:510, y:F-120, w:140, h:16, s:'plat'},
+      {x:900, y:F, w:280, h:40, s:'ground'},
+      {x:930, y:F-130, w:120, h:16, s:'plat'},
+      {x:930, y:F-280, w:220, h:16, s:'plat'},
+      {x:258, y:F-280, w:22,  h:200, s:'wall'},
+      {x:1300,y:F, w:300, h:40, s:'ground'},
+      {x:1320,y:F-130, w:150, h:16, s:'plat'},
+      {x:1330,y:F-270, w:220, h:16, s:'plat'},
+    ],
+    plates: [{x:30, y:F-16, w:100, h:16, gateId:'G9', active:false}],
+    gates: [{x:258, y:F-150, w:22, h:150, id:'G9', open:false}],
+    keys: [{x:580, y:F-140, id:'K9', got:false}],
+    doors: [{x:195, y:F-280, w:60, h:16, keyId:'K9', open:false, isBlocking:true}],
+    ghosts:[],
+    exit:{x:20, y:F-285-58, w:160, h:58},
+    sp1:{x:40,  y:F-60},
+    sp2:{x:160, y:F-60},
+    msgs:[
+      '🔑 Key Across the Void! The key sits on an isolated island.',
+      '💡 P1: Hold plate to open gate. P2: Leap across, grab KEY, return!',
+      '💡 P2 unlocks door → both reach EXIT!'
+    ]
+  },
+  {
+    // Level 10 — Grand Canyon (Stage 2 Finale)
+    name: 'Grand Canyon',
+    bg: ['#1a0000', '#2a0800'],
+    worldWidth: 1800,
+    platforms: [
+      {x:0,   y:F, w:300, h:40, s:'ground'},
+      {x:30,  y:F-130, w:120, h:16, s:'plat'},
+      {x:140, y:F-250, w:140, h:16, s:'plat'},
+      {x:520, y:F, w:260, h:40, s:'ground'},
+      {x:540, y:F-120, w:120, h:16, s:'plat'},
+      {x:1060,y:F, w:240, h:40, s:'ground'},
+      {x:1080,y:F-130, w:110, h:16, s:'plat'},
+      {x:1070,y:F-270, w:200, h:16, s:'plat'},
+      {x:1530,y:F, w:270, h:40, s:'ground'},
+      {x:1550,y:F-130, w:130, h:16, s:'plat'},
+      {x:1550,y:F-270, w:220, h:16, s:'plat'},
+      {x:1560,y:F-400, w:200, h:16, s:'plat'},
+    ],
+    plates: [
+      {x:1090, y:F-280,  w:100, h:16, gateId:'G10A', active:false},
+      {x:1090,y:F-16,  w:100, h:16, gateId:'G10B', active:false},
+    ],
+    ghosts: [{x:780, y:F-16, w:280, h:16, plateId:'G10A'}],
+    gates: [{x:1258,y:F-270, w:22, h:270, id:'G10B', open:false}],
+    keys: [{x:1310, y:F-40, id:'K10', got:false}],
+    doors: [{x:1540, y:F-130, w:22, h:16, keyId:'K10', open:false, isBlocking:true}],
+    boostZoneX:1210, boostZoneW:90,
+    exit:{x:1565, y:F-400-58, w:180, h:58},
+    sp1:{x:40,  y:F-60},
+    sp2:{x:160, y:F-60},
+    msgs:[
+      '🏆 GRAND CANYON — Stage 2 Finale! Three chasms stand between you and victory.',
+      '💡 Ghost bridge (hold plate!) → Partner Boost over the last gap!',
+      '💡 Grab the KEY, unlock DOOR, reach the TOP — you\'ve got this!'
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════
+// UI & LEVEL SELECT
+// ═══════════════════════════════════════════════
+function renderMenu() {
+  const grid = document.getElementById('levelSelectGrid');
+  grid.innerHTML = '';
+  LEVELS.forEach((l, i) => {
+    // Insert stage divider between level 5 and 6
+    if(i === 5) {
+      const div = document.createElement('div');
+      div.className = 'stage-divider';
+      div.innerHTML = '<div class="stage-divider-line"></div><div class="stage-divider-label">⚠️ Stage 2 — Underground Ruins</div><div class="stage-divider-line"></div>';
+      grid.appendChild(div);
+    }
+    const btn = document.createElement('button');
+    btn.className = 'lvl-btn' + (i >= 5 ? ' stage2' : '');
+    const num = i + 1;
+    const isUnlocked = num <= save.unlocked;
+    btn.textContent = isUnlocked ? num : '🔒';
+    btn.disabled = !isUnlocked;
+    if (isUnlocked && save.stars[num]) {
+      const st = document.createElement('div');
+      st.className = 'lvl-stars';
+      st.style.color = i >= 5 ? '#FF8C00' : '#FFD166';
+      st.textContent = '★'.repeat(save.stars[num]);
+      btn.appendChild(st);
+    }
+    btn.onclick = () => { curLvl = i; showScreen('game'); spawnLvl(); initAudio(); };
+    grid.appendChild(btn);
+  });
+}
+
+function showScreen(id) {
+  ['sTitle', 'sPause', 'sComplete', 'sWin', 'sControls', 'sLevels'].forEach(s => document.getElementById(s).classList.add('hidden'));
+  const hud=document.getElementById('hud'), cnv=canvas;
+  if(id === 'game') {
+    hud.style.display='flex'; cnv.style.display='block';
+    paused = false;
+  } else {
+    hud.style.display='none'; cnv.style.display='none';
+    document.getElementById(id).classList.remove('hidden');
+    if(id === 'sTitle') renderMenu();
+    if(id === 'sWin') confettiLoop();
+  }
+}
+
+let cLoopT;
+function confettiLoop() {
+  confetti();
+  clearTimeout(cLoopT);
+  cLoopT = setTimeout(() => { if(!document.getElementById('sWin').classList.contains('hidden')) confettiLoop(); }, 3000);
+}
+
+// ═══════════════════════════════════════════════
+// TOAST MSG QUEUE
+// ═══════════════════════════════════════════════
+let _msgQ=[], _msgI=0, _toastT=0;
+function showMsgs(arr) { _msgQ=arr||[]; _msgI=0; if(_msgQ.length) showToast(_msgQ[_msgI++]); }
+function showToast(txt, dur=3500) {
+  const el = document.getElementById('toast');
+  el.textContent = txt; 
+  el.classList.remove('gone');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => {
+    el.classList.add('gone');
+    setTimeout(() => { if(_msgI < _msgQ.length) showToast(_msgQ[_msgI++]); }, 400);
+  }, dur);
+}
+
+// ═══════════════════════════════════════════════
+// PLAYER CLASS
+// ═══════════════════════════════════════════════
+class Player {
+  constructor(id, x, y, isP1) {
+    this.isP1 = isP1;
+    this.x = x; this.y = y; this.w = 34; this.h = 34;
+    this.vx = 0; this.vy = 0;
+    this.onGround = false; this.hasKey = false;
+    this.dir = 1; this.squish = 0; this.wasJump = false;
+    
+    // Game feel variables
+    this.coyote = 0;
+    this.jumpBuffer = 0;
+    this.tilt = 0;
+    this.onLaunchPad = false;
+  }
+  get cx(){ return this.x+this.w/2; }
+  get cy(){ return this.y+this.h/2; }
+  get bot(){ return this.y+this.h; }
+  get right(){ return this.x+this.w; }
+}
+
+function ov(ax,ay,aw,ah,bx,by,bw,bh) { return ax<bx+bw && ax+aw>bx && ay<by+bh && ay+ah>by; }
+function near(pl,dx,dy,dw,dh,pad) { return ov(pl.x,pl.y,pl.w,pl.h, dx-pad,dy-pad,dw+pad*2,dh+pad*2); }
+
+function spawnLvl() {
+  lvl = JSON.parse(JSON.stringify(LEVELS[curLvl]));
+  p1 = new Player(1, lvl.sp1.x, lvl.sp1.y, true);
+  p2 = new Player(2, lvl.sp2.x, lvl.sp2.y, false);
+  completing = false; paused = false; shake = 0; cameraX = 0;
+  fallsCount1 = 0; fallsCount2 = 0; updateFallsHUD();
+  particles = [];
+  document.getElementById('hudLv').textContent = `Level ${curLvl+1}`;
+  document.getElementById('hudNm').textContent = lvl.name;
+  showMsgs(lvl.msgs);
+}
+
+function updateFallsHUD() {
+  document.getElementById('fallsP1').textContent = fallsCount1;
+  document.getElementById('fallsP2').textContent = fallsCount2;
+}
+
+// ═══════════════════════════════════════════════
+// SOLIDS & PHYSICS
+// ═══════════════════════════════════════════════
+function buildSolids() {
+  const s = [...lvl.platforms];
+  lvl.gates.forEach(g => { if(!g.open) s.push({x:g.x, y:g.y, w:g.w, h:g.h, s:'wall'}) });
+  lvl.doors.forEach(d => { if(!d.open && d.isBlocking!==false) s.push({x:d.x, y:d.y, w:d.w, h:d.h, s:'wall'}) });
+  const aPlates = new Set();
+  lvl.plates.forEach(pl => { if(pl.active) aPlates.add(pl.gateId) });
+  lvl.ghosts.forEach(gh => { if(aPlates.has(gh.plateId)) s.push({x:gh.x,y:gh.y,w:gh.w,h:gh.h, s:'plat'}) });
+  return s;
+}
+
+function resolveVsSolids(pl, solids) {
+  let wasOnGround = pl.onGround;
+  pl.onGround = false;
+  for(let pass=0; pass<3; pass++) {
+    for(const s of solids) {
+      if(!ov(pl.x,pl.y,pl.w,pl.h, s.x,s.y,s.w,s.h)) continue;
+      const oL = pl.right - s.x, oR = s.x+s.w - pl.x;
+      const oT = pl.bot - s.y, oB = s.y+s.h - pl.y;
+      const mH = Math.min(oL,oR), mV = Math.min(oT,oB);
+      if(mV < mH) {
+        if(oT < oB) { 
+          pl.y = s.y - pl.h; 
+          if(pl.vy > 0) {
+            if(pl.vy > 8) { shake = 3; sfx.land(); spawnGfx(pl.cx, pl.bot, 'dust', '#fff', 8); pl.squish = 8; }
+            pl.vy = 0; 
+          }
+          pl.onGround = true; 
+        } else {
+          pl.y = s.y + s.h; if(pl.vy < 0) pl.vy = 0;
+        }
+      } else {
+        if(oL < oR) { pl.x = s.x - pl.w; if(pl.vx > 0) pl.vx = 0; }
+        else { pl.x = s.x + s.w; if(pl.vx < 0) pl.vx = 0; }
+      }
+    }
+  }
+}
+
+function resolveVsPartner(mover, other) {
+  if(!ov(mover.x,mover.y,mover.w,mover.h, other.x,other.y,other.w,other.h)) return;
+  const oL = mover.right - other.x, oR = other.x+other.w - mover.x;
+  const oT = mover.bot - other.y, oB = other.y+other.h - mover.y;
+  const mH = Math.min(oL,oR), mV = Math.min(oT,oB);
+  
+  if(mV < mH) {
+    if(oT < oB && mover.vy >= 0) {
+      mover.y = other.y - mover.h;
+      if(mover.vy > 0) mover.vy = 0;
+      mover.onGround = true;
+    } else if(oB < oT && other.vy >= 0) {
+      other.y = mover.y - other.h;
+      if(other.vy > 0) other.vy = 0;
+      other.onGround = true;
+    }
+  } else {
+    // Push mechanics horizontally
+    if(oL < oR) { 
+      mover.x = other.x - mover.w; 
+      if(mover.vx > 0) { other.vx += mover.vx * 0.4; mover.vx *= 0.5; }
+    } else { 
+      mover.x = other.x + other.w; 
+      if(mover.vx < 0) { other.vx += mover.vx * 0.4; mover.vx *= 0.5; }
+    }
+  }
+}
+
+function onPartner(pl, other) {
+  return pl.onGround && pl.bot >= other.y-10 && pl.bot <= other.y+20 && pl.right > other.x-4 && pl.x < other.right+4;
+}
+
+// ═══════════════════════════════════════════════
+// UPDATE LOOP
+// ═══════════════════════════════════════════════
+function update() {
+  if(!p1 || !p2 || completing || paused) return;
+
+  // Global inputs
+  if(justPressed['Escape']) { document.getElementById('btnPause').click(); return; }
+
+  // Player Inputs
+  const p1L = keys['KeyA'], p1R = keys['KeyD'], p1J = keys['KeyW'];
+  const p2L = keys['ArrowLeft'], p2R = keys['ArrowRight'], p2J = keys['ArrowUp'];
+
+  function handlePl(pl, isL, isR, isJ, other) {
+    // Movement & Tilt
+    if(isL) { pl.vx = -SPD; pl.dir = -1; pl.tilt = Math.max(pl.tilt-0.1, -0.2); }
+    else if(isR) { pl.vx = SPD; pl.dir = 1; pl.tilt = Math.min(pl.tilt+0.1, 0.2); }
+    else { pl.vx *= 0.55; pl.tilt *= 0.8; }
+    if (pl.onGround && Math.abs(pl.vx) > 1.5 && Math.random() < 0.15) spawnGfx(pl.cx, pl.bot, 'dust', '#fff', 1);
+
+    // Coyote & Buffer
+    if(pl.onGround) pl.coyote = 6; else if(pl.coyote > 0) pl.coyote--;
+    if(isJ && !pl.wasJump) pl.jumpBuffer = 8; else if(pl.jumpBuffer > 0) pl.jumpBuffer--;
+
+    // Jump execution
+    if(pl.jumpBuffer > 0 && pl.coyote > 0) {
+      pl.jumpBuffer = 0; pl.coyote = 0;
+      if(onPartner(pl, other)) {
+        pl.vy = BOOST; sfx.boost(); shake = 6;
+        spawnGfx(pl.cx, pl.bot, 'star', '#FFD166', 15);
+      } else if(pl.onLaunchPad) {
+        pl.vy = BOOST; sfx.boost(); shake = 4;
+        spawnGfx(pl.cx, pl.bot, 'star', '#FF8C00', 15);
+        spawnGfx(pl.cx, pl.bot, 'dust', '#FF4400', 6);
+      } else {
+        pl.vy = JFORCE; sfx.jump();
+        spawnGfx(pl.cx, pl.bot, 'dust', '#fff', 5);
+      }
+      pl.squish = 12;
+    }
+    
+    // Variable jump height
+    if(!isJ && pl.vy < -4) pl.vy *= 0.7;
+    pl.wasJump = isJ;
+    
+    pl.vy += GRAV;
+    pl.x += pl.vx; pl.y += pl.vy;
+    if(pl.squish > 0) pl.squish--;
+
+    // Particles trail if boosting
+    if(pl.vy < -12) spawnGfx(pl.cx, pl.bot-10, 'dust', pl.isP1?'#FF6B6B':'#4ECDC4', 1);
+
+    // Bounds — use level worldWidth if defined, else GW
+    const WW = lvl.worldWidth || GW;
+    if(pl.x < 0) { pl.x = 0; pl.vx = 0; }
+    if(pl.x+pl.w > WW) { pl.x = WW-pl.w; pl.vx = 0; }
+  }
+
+  handlePl(p1, p1L, p1R, p1J, p2);
+  handlePl(p2, p2L, p2R, p2J, p1);
+
+  const solids = buildSolids();
+  resolveVsSolids(p1, solids);
+  resolveVsSolids(p2, solids);
+  resolveVsPartner(p1, p2);
+  resolveVsPartner(p2, p1);
+
+  // Co-op camera constraint: on scrolling levels, players can't go off opposite screen edges
+  if((lvl.worldWidth || GW) > GW) {
+    const MAX_SEP = 760; // max pixel separation between player centers
+    const sep = p2.cx - p1.cx;
+    if(sep > MAX_SEP) { 
+      const excess = (sep - MAX_SEP) / 2;
+      p1.x += excess; p2.x -= excess;
+      if(p1.vx < 0) p1.vx = 0;
+      if(p2.vx > 0) p2.vx = 0;
+    } else if(-sep > MAX_SEP) {
+      const excess = (-sep - MAX_SEP) / 2;
+      p1.x -= excess; p2.x += excess;
+      if(p1.vx > 0) p1.vx = 0;
+      if(p2.vx < 0) p2.vx = 0;
+    }
+  }
+
+  // Fall Death logic
+  const fallCheck = (pl, sp, isP1) => {
+    if(pl.y > GH + 100) {
+      sfx.fall(); shake = 5;
+      const hadKey = pl.hasKey;
+      pl.x = sp.x; pl.y = sp.y; pl.vx = 0; pl.vy = 0; pl.hasKey = false;
+      lvl.plates.forEach(p => p.active = false);
+      if(hadKey) { lvl.keys.forEach(k=>k.got=false); lvl.doors.forEach(d=>d.open=false); }
+      if(isP1) fallsCount1++; else fallsCount2++;
+      updateFallsHUD();
+    }
+  };
+  fallCheck(p1, lvl.sp1, true);
+  fallCheck(p2, lvl.sp2, false);
+
+  updateParticles();
+
+  // Plates
+  const gA={}, gC={};
+  lvl.plates.forEach(pl => {
+    const on = (p) => p.bot>=pl.y-3 && p.bot<=pl.y+pl.h+8 && p.right>pl.x+6 && p.x<pl.x+pl.w-6;
+    pl.active = on(p1) || on(p2);
+    gC[pl.gateId] = (gC[pl.gateId]||0) + 1;
+    if(pl.active) gA[pl.gateId] = (gA[pl.gateId]||0) + 1;
+  });
+  lvl.gates.forEach(g => g.open = (gA[g.id]||0) >= (gC[g.id]||1));
+
+  // Keys
+  lvl.keys.forEach(k => {
+    if(k.got) return;
+    const hit = (p) => ov(p.x,p.y,p.w,p.h, k.x-20,k.y-20,40,40);
+    if(hit(p1)) { k.got=true; p1.hasKey=true; sfx.key(); spawnGfx(k.x,k.y,'star','#FFD166',20); }
+    else if(hit(p2)) { k.got=true; p2.hasKey=true; sfx.key(); spawnGfx(k.x,k.y,'star','#FFD166',20); }
+  });
+
+  // Doors
+  lvl.doors.forEach(d => {
+    if(d.open) return;
+    const carrier = p1.hasKey ? p1 : p2.hasKey ? p2 : null;
+    if(carrier && near(carrier, d.x,d.y,d.w,d.h, 60)) {
+      d.open = true; sfx.door();
+      carrier.hasKey = false;
+      spawnGfx(d.x+d.w/2, d.y+d.h/2, 'star', '#C77DFF', 30);
+      shake = 4;
+      showToast('🚪 Door unlocked! GO!', 2000);
+    }
+  });
+
+  // Launch Pads — first player to stand on it claims it, gets solo super jump
+  if(lvl.launchPads) {
+    lvl.launchPads.forEach(lp => {
+      const onPad = (pl) => pl.onGround && pl.bot >= lp.y-4 && pl.bot <= lp.y+lp.h+6 && pl.right > lp.x+4 && pl.x < lp.x+lp.w-4;
+      const p1on = onPad(p1), p2on = onPad(p2);
+      // Assign occupant — first to arrive claims it; released when they leave
+      if(!lp.occupied) {
+        if(p1on) lp.occupied = 'p1';
+        else if(p2on) lp.occupied = 'p2';
+      } else {
+        if(lp.occupied === 'p1' && !p1on) lp.occupied = null;
+        if(lp.occupied === 'p2' && !p2on) lp.occupied = null;
+      }
+      // Grant solo boost jump to the occupant
+      const boostedPl = lp.occupied === 'p1' ? p1 : lp.occupied === 'p2' ? p2 : null;
+      if(boostedPl) {
+        boostedPl.onLaunchPad = true;
+      }
+    });
+    // Clear flag for players not on any pad
+    const p1OnAny = lvl.launchPads.some(lp => lp.occupied === 'p1');
+    const p2OnAny = lvl.launchPads.some(lp => lp.occupied === 'p2');
+    if(!p1OnAny) p1.onLaunchPad = false;
+    if(!p2OnAny) p2.onLaunchPad = false;
+  }
+
+  // Exit
+  const ex = lvl.exit, doorBlock = lvl.doors.some(d=>!d.open);
+  if(ov(p1.x,p1.y,p1.w,p1.h, ex.x,ex.y,ex.w,ex.h) && ov(p2.x,p2.y,p2.w,p2.h, ex.x,ex.y,ex.w,ex.h) && !doorBlock && !completing) {
+    completing = true;
+    sfx.win(); confetti();
+    
+    // Calculate Stars
+    const totalFalls = fallsCount1 + fallsCount2;
+    let earnedStars = 3;
+    if(totalFalls > 0) earnedStars = 2;
+    if(totalFalls >= 4) earnedStars = 1;
+
+    // Save progress
+    const lvlNum = curLvl + 1;
+    save.stars[lvlNum] = Math.max(save.stars[lvlNum] || 0, earnedStars);
+    save.totalFails = (save.totalFails || 0) + totalFalls;
+    if(lvlNum === save.unlocked && lvlNum < LEVELS.length) save.unlocked++;
+    saveProgress();
+
+    setTimeout(() => {
+      document.getElementById('ccF1').textContent = fallsCount1;
+      document.getElementById('ccF2').textContent = fallsCount2;
+      
+      const spans = document.getElementById('ccStars').querySelectorAll('span');
+      spans.forEach((s, idx) => {
+        s.className = (idx < earnedStars) ? 'earned' : '';
+      });
+
+      if(curLvl === LEVELS.length - 1) {
+        document.getElementById('ccTotalFails').textContent = save.totalFails || 0;
+        showScreen('sWin');
+      } else {
+        document.getElementById('cBtnNext').style.display = '';
+        showScreen('sComplete');
+      }
+    }, 1000);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// DRAWING
+// ═══════════════════════════════════════════════
+const pBg = [];
+for(let i=0; i<60; i++) pBg.push({x:Math.random(), y:Math.random(), s:Math.random()*1.5+0.5, a:Math.random()});
+
+function draw() {
+  // --- Camera update ---
+  const WW = lvl.worldWidth || GW;
+  if(WW > GW) {
+    const midX = (p1.cx + p2.cx) / 2;
+    const targetCam = midX - GW / 2;
+    cameraX += (targetCam - cameraX) * 0.1; // smooth lerp
+    cameraX = Math.max(0, Math.min(WW - GW, cameraX));
+  } else {
+    cameraX = 0;
+  }
+
+  ctx.save();
+  if(shake > 0) {
+    ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
+    shake = Math.max(0, shake-0.5);
+  }
+
+  // BG Gradient & Parallax Stars — drawn in screen space (before camera translate)
+  const sg = ctx.createLinearGradient(0,0,0,GH);
+  sg.addColorStop(0, lvl.bg[0]); sg.addColorStop(1, lvl.bg[1]);
+  ctx.fillStyle=sg; ctx.fillRect(0,0,GW,GH);
+
+  const t = Date.now();
+  ctx.fillStyle='#fff';
+  pBg.forEach((p, i) => {
+    ctx.globalAlpha = p.a * (0.5 + Math.sin(t*0.002 + i)*0.5);
+    // parallax: stars scroll at half speed
+    ctx.beginPath(); ctx.arc((p.x*GW + t*0.01*p.s - cameraX*0.3)%GW, p.y*GH, p.s, 0, Math.PI*2); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+
+  // Apply camera offset — everything below is in world space
+  ctx.translate(-Math.round(cameraX), 0);
+
+  if(lvl.boostZoneX !== undefined) {
+    ctx.fillStyle='rgba(78,205,196,0.1)'; ctx.fillRect(lvl.boostZoneX, F-40, lvl.boostZoneW, 40);
+    ctx.fillStyle='rgba(78,205,196,0.6)'; ctx.font='bold 12px Nunito'; ctx.textAlign='center';
+    ctx.fillText('BOOST ZONE', lvl.boostZoneX+lvl.boostZoneW/2, F-8);
+  }
+
+  lvl.platforms.forEach(p => drawPlat(p.x,p.y,p.w,p.h,p.s));
+  
+  const aPIds = new Set();
+  lvl.plates.forEach(pl => { if(pl.active) aPIds.add(pl.gateId); drawPlate(pl); });
+  if(lvl.launchPads) lvl.launchPads.forEach(lp => drawLaunchPad(lp));
+  
+  lvl.ghosts.forEach(gh => drawGhost(gh, aPIds.has(gh.plateId)));
+  lvl.gates.forEach(g => { if(!g.open) drawGate(g); });
+  
+  lvl.keys.forEach(k => { if(!k.got) drawKey(k.x, k.y); });
+  lvl.doors.forEach(d => { if(!d.open) drawDoor(d); });
+  drawExit(lvl.exit);
+
+  drawParticles();
+
+  drawPlayer(p2); drawPlayer(p1);
+  if(p1.hasKey) drawCarryKey(p1);
+  if(p2.hasKey) drawCarryKey(p2);
+
+  ctx.restore();
+}
+
+function rr(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); }
+
+const PC={ground:['#3a405a','#282c40'], plat:['#FFB347','#D4832A'], wall:['#6BADB0','#4A8082']};
+function drawPlat(x,y,w,h,s) {
+  const[top,bot]=PC[s];
+  ctx.fillStyle=bot; rr(x,y+4,w,h,8); ctx.fill();
+  ctx.fillStyle=top; rr(x,y,w,h-2,8); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.1)'; rr(x+4,y+2,w-8,h/4,3); ctx.fill();
+}
+
+function drawGhost(gh, act) {
+  if(act) {
+    ctx.shadowColor='#FFD166'; ctx.shadowBlur=15; drawPlat(gh.x,gh.y,gh.w,gh.h,'plat'); ctx.shadowBlur=0;
+  } else {
+    ctx.strokeStyle='rgba(255,179,71,0.4)'; ctx.setLineDash([5,5]); ctx.lineWidth=2;
+    rr(gh.x,gh.y,gh.w,gh.h,6); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,179,71,0.05)'; ctx.fill();
+  }
+}
+
+function drawGate(g) {
+  ctx.fillStyle='#FF6B6B'; rr(g.x,g.y,g.w,g.h,4); ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,0.2)';
+  for(let y=g.y+10; y<g.y+g.h; y+=15) ctx.fillRect(g.x+2,y,g.w-4,4);
+  ctx.font='16px serif'; ctx.textAlign='center'; ctx.fillText('🔒',g.x+g.w/2,g.y+g.h/2+6);
+}
+
+function drawPlate(pl) {
+  const col = pl.active ? '#6BCB77' : '#FF9F1C';
+  ctx.fillStyle=col; rr(pl.x,pl.y+(pl.active?4:0),pl.w,pl.h-(pl.active?4:0),5); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.3)'; rr(pl.x+4,pl.y+(pl.active?6:2),pl.w-8,4,2); ctx.fill();
+}
+
+function drawLaunchPad(lp) {
+  const pulse = Math.sin(Date.now()/300)*0.3+0.7;
+  // Base plate — dark red
+  ctx.fillStyle='#7a1a00';
+  rr(lp.x, lp.y+4, lp.w, lp.h-4, 6); ctx.fill();
+  // Top surface — glowing orange/red gradient
+  const lg = ctx.createLinearGradient(lp.x, lp.y, lp.x, lp.y+lp.h);
+  lg.addColorStop(0, lp.occupied ? '#FF6B6B' : '#FF8C00');
+  lg.addColorStop(1, lp.occupied ? '#CC2200' : '#CC5500');
+  ctx.fillStyle = lg;
+  rr(lp.x, lp.y, lp.w, lp.h-4, 6); ctx.fill();
+  // Glow effect
+  ctx.shadowColor = lp.occupied ? '#FF4444' : '#FF8C00';
+  ctx.shadowBlur = 12 * pulse;
+  ctx.fillStyle = 'rgba(255,140,0,0.25)';
+  rr(lp.x+2, lp.y+2, lp.w-4, lp.h-8, 4); ctx.fill();
+  ctx.shadowBlur = 0;
+  // Arrow chevrons pointing up
+  ctx.strokeStyle = lp.occupied ? 'rgba(255,200,200,0.9)' : 'rgba(255,220,100,0.9)';
+  ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const cx2 = lp.x + lp.w/2, cy2 = lp.y + lp.h/2 - 1;
+  ctx.beginPath(); ctx.moveTo(cx2-8,cy2+4); ctx.lineTo(cx2,cy2-4); ctx.lineTo(cx2+8,cy2+4); ctx.stroke();
+  // Label
+  ctx.fillStyle = lp.occupied ? 'rgba(255,180,180,0.9)' : 'rgba(255,220,100,0.9)';
+  ctx.font = 'bold 9px Nunito'; ctx.textAlign='center';
+  ctx.fillText(lp.occupied ? 'TAKEN' : 'LAUNCH', lp.x+lp.w/2, lp.y-5);
+}
+
+function drawKey(x,y) {
+  const t = Date.now()/300;
+  ctx.save(); ctx.translate(x, y + Math.sin(t)*5);
+  ctx.shadowColor='#FFD166'; ctx.shadowBlur=20;
+  ctx.font='30px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🔑',0,0);
+  ctx.restore();
+}
+function drawCarryKey(pl) { ctx.font='20px serif'; ctx.textAlign='center'; ctx.fillText('🔑',pl.cx,pl.y-15); }
+
+function drawDoor(d) {
+  const ts = Math.sin(Date.now()/500);
+  ctx.fillStyle='#9B4EC7'; rr(d.x-4,d.y,d.w+8,d.h+4,9); ctx.fill();
+  ctx.fillStyle='#C77DFF'; rr(d.x,d.y+4,d.w,d.h-4,7); ctx.fill();
+  ctx.shadowColor='#C77DFF'; ctx.shadowBlur=10 + ts*5;
+  ctx.fillStyle='#FFD166'; ctx.beginPath(); ctx.arc(d.x+d.w/2, d.y+d.h/2-5, 8, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+}
+
+function drawExit(ex) {
+  const ts = Math.sin(Date.now()/400);
+  ctx.fillStyle='#C68A00'; rr(ex.x-4,ex.y,ex.w+8,ex.h+6,10); ctx.fill();
+  ctx.fillStyle='#FFD166'; rr(ex.x,ex.y+4,ex.w,ex.h-4,8); ctx.fill();
+  ctx.shadowColor='#FFF'; ctx.shadowBlur=20 + ts*10;
+  ctx.font='32px serif'; ctx.textAlign='center'; ctx.fillText('⭐',ex.x+ex.w/2,ex.y+ex.h/2+10+ts*3); ctx.shadowBlur=0;
+}
+
+function drawPlayer(pl) {
+  const col = pl.isP1 ? '#FF7A7A' : '#4ECDC4';
+  const col2 = pl.isP1 ? '#FFAA6B' : '#6EE5DB';
+  const drk = pl.isP1 ? '#C94040' : '#2EA89E';
+  const glowCol = pl.isP1 ? 'rgba(255,120,120,0.65)' : 'rgba(78,205,196,0.65)';
+  
+  const vSq = pl.onGround ? 0 : Math.max(-0.2, Math.min(0.2, pl.vy*0.015));
+  const sq = pl.squish/10;
+  const sx = 1 + sq*0.2 - vSq*0.5;
+  const sy = 1 - sq*0.2 + vSq;
+  
+  const tTime = Date.now();
+  const bob = pl.onGround && Math.abs(pl.vx)<0.5 ? Math.sin(tTime/200)*2 : (pl.onGround ? Math.abs(Math.sin(tTime/100))*3 - 1 : 0);
+  const tailBase = Math.sin(tTime/(pl.vx===0?300:100))*0.5;
+  const isBlink = (tTime % 4000 < 150) || (tTime % 5500 < 100);
+  
+  ctx.save(); 
+  ctx.translate(pl.cx, pl.cy + bob); 
+  ctx.rotate(pl.tilt);
+  ctx.scale(pl.dir*sx, sy);
+  const r = pl.w/2;
+
+  // Drop shadow
+  ctx.fillStyle='rgba(0,0,0,0.22)';
+  ctx.beginPath(); ctx.ellipse(0, r+10-bob, r*0.9, r*0.28, 0,0,Math.PI*2); ctx.fill();
+
+  // === TAIL (drawn behind body) ===
+  ctx.save();
+  ctx.translate(-r+4, 2);
+  ctx.rotate(-0.5 + tailBase);
+  if(pl.isP1) {
+    // Cat: long slender curving tail
+    const tg = ctx.createLinearGradient(-18,0,0,0);
+    tg.addColorStop(0,'#FFD580'); tg.addColorStop(0.5,'#FFAA6B'); tg.addColorStop(1, drk);
+    ctx.fillStyle = tg;
+    ctx.beginPath(); ctx.ellipse(-7, 0, 12, 3.5, 0, 0, Math.PI*2); ctx.fill();
+    // fluffy tip
+    ctx.fillStyle='#FFE8A0';
+    ctx.beginPath(); ctx.ellipse(-17, 0, 5, 4.5, 0, 0, Math.PI*2); ctx.fill();
+  } else {
+    // Dog: short stubby wagging tail
+    const tg = ctx.createLinearGradient(-14,0,0,0);
+    tg.addColorStop(0,'#88EBE3'); tg.addColorStop(1, drk);
+    ctx.fillStyle = tg;
+    ctx.beginPath(); ctx.ellipse(-6, 0, 9, 5.5, 0, 0, Math.PI*2); ctx.fill();
+    // fluffy tip
+    ctx.fillStyle='rgba(255,255,255,0.5)';
+    ctx.beginPath(); ctx.ellipse(-13, 0, 5, 4, 0, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+
+  // === BODY glow + base ===
+  ctx.shadowColor = glowCol; ctx.shadowBlur = 20;
+  ctx.fillStyle = col;
+  ctx.beginPath(); ctx.ellipse(0,0,r,r,0,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Body radial gradient
+  const bg = ctx.createRadialGradient(-4,-5, r*0.1, -2,-3, r*1.1);
+  bg.addColorStop(0, col2); bg.addColorStop(0.5, col); bg.addColorStop(1, drk);
+  ctx.fillStyle = bg;
+  ctx.beginPath(); ctx.ellipse(0,0,r,r,0,0,Math.PI*2); ctx.fill();
+
+  // Belly / tummy lighter patch
+  ctx.fillStyle='rgba(255,255,255,0.18)';
+  ctx.beginPath(); ctx.ellipse(0,4, r*0.6, r*0.5, 0,0,Math.PI*2); ctx.fill();
+  // Top highlight
+  ctx.fillStyle='rgba(255,255,255,0.28)';
+  ctx.beginPath(); ctx.ellipse(-4,-6, r*0.5, r*0.38, -0.5,0,Math.PI*2); ctx.fill();
+
+  // ========== CAT (P1) ==========
+  if(pl.isP1) {
+    // Pointy cat ears — outer
+    const earOuter = ctx.createLinearGradient(0,-r-16,0,-r+4);
+    earOuter.addColorStop(0,'#FFB060'); earOuter.addColorStop(1, col);
+    ctx.fillStyle = earOuter;
+    ctx.shadowColor='rgba(255,170,80,0.4)'; ctx.shadowBlur=7;
+    // Left ear (pointy triangle)
+    ctx.beginPath(); ctx.moveTo(-r+1,-r+7); ctx.lineTo(-r+8,-r-17); ctx.lineTo(-r+20,-r+4); ctx.closePath(); ctx.fill();
+    // Right ear
+    ctx.beginPath(); ctx.moveTo(r-1,-r+7); ctx.lineTo(r-8,-r-17); ctx.lineTo(r-20,-r+4); ctx.closePath(); ctx.fill();
+    ctx.shadowBlur=0;
+    // Inner ear — rosy pink
+    ctx.fillStyle='rgba(255,170,190,0.75)';
+    ctx.beginPath(); ctx.moveTo(-r+4,-r+6); ctx.lineTo(-r+8,-r-11); ctx.lineTo(-r+17,-r+4); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(r-4,-r+6); ctx.lineTo(r-8,-r-11); ctx.lineTo(r-17,-r+4); ctx.closePath(); ctx.fill();
+
+    // Forehead fur stripes
+    ctx.strokeStyle='rgba(180,60,30,0.4)'; ctx.lineWidth=2; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(-3,-14); ctx.lineTo(-3,-7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(3,-16); ctx.lineTo(3,-8); ctx.stroke();
+
+    // Muzzle (cat has distinct muzzle area)
+    ctx.fillStyle='rgba(255,240,230,0.55)';
+    ctx.beginPath(); ctx.ellipse(0, 3, 8, 6, 0,0,Math.PI*2); ctx.fill();
+
+    // Cat nose — small pink triangle
+    ctx.fillStyle='#FF9EB5';
+    ctx.shadowColor='#FF9EB5'; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.moveTo(-2.5, 0); ctx.lineTo(2.5, 0); ctx.lineTo(0, 2.5); ctx.closePath(); ctx.fill();
+    ctx.shadowBlur=0;
+    // Nose-mouth lines
+    ctx.strokeStyle='rgba(150,60,80,0.6)'; ctx.lineWidth=1.2; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(0,2.5); ctx.lineTo(0,5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,5); ctx.quadraticCurveTo(-4,7,-5,6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,5); ctx.quadraticCurveTo(4,7,5,6); ctx.stroke();
+
+    // Whiskers — 3 per side, longer
+    ctx.strokeStyle='rgba(255,255,255,0.75)'; ctx.lineWidth=1.1;
+    ctx.beginPath(); ctx.moveTo(-7,-1); ctx.lineTo(-18,-3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-7,1); ctx.lineTo(-19,1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-7,3); ctx.lineTo(-17,5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(7,-1); ctx.lineTo(18,-3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(7,1); ctx.lineTo(19,1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(7,3); ctx.lineTo(17,5); ctx.stroke();
+
+    // Blush cheeks
+    ctx.fillStyle='rgba(255,140,150,0.3)';
+    ctx.beginPath(); ctx.ellipse(-11,3,5,3.5,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(11,3,5,3.5,0,0,Math.PI*2); ctx.fill();
+
+  // ========== DOG (P2) ==========
+  } else {
+    // Long floppy ears hanging down the sides
+    const earGd = ctx.createLinearGradient(0,-r+4,0,r+8);
+    earGd.addColorStop(0,'#3BCCC0'); earGd.addColorStop(1,'#1A7A74');
+    ctx.fillStyle = earGd;
+    ctx.shadowColor='rgba(60,200,190,0.4)'; ctx.shadowBlur=10;
+    const earFlap = Math.max(-0.35, Math.min(0.35, -pl.vy*0.04));
+    // Left ear — wide, rounded, hangs at side
+    ctx.save(); ctx.translate(-r+1, -r+10); ctx.rotate(-0.15 + earFlap*0.5);
+    ctx.beginPath(); ctx.ellipse(0, 5, 9, 19, 0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    // Right ear
+    ctx.save(); ctx.translate(r-1, -r+10); ctx.rotate(0.15 - earFlap*0.5);
+    ctx.beginPath(); ctx.ellipse(0, 5, 9, 19, 0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.shadowBlur=0;
+    // Ear highlight
+    ctx.fillStyle='rgba(100,230,220,0.2)';
+    ctx.save(); ctx.translate(-r+1,-r+10); ctx.rotate(-0.15+earFlap*0.5);
+    ctx.beginPath(); ctx.ellipse(-2,3,4,12,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(r-1,-r+10); ctx.rotate(0.15-earFlap*0.5);
+    ctx.beginPath(); ctx.ellipse(2,3,4,12,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+
+    // Dog snout — wider, more protruding
+    ctx.fillStyle='rgba(255,250,240,0.5)';
+    ctx.beginPath(); ctx.ellipse(0, 4, 10, 7, 0,0,Math.PI*2); ctx.fill();
+
+    // Big dog nose — rounded rectangle shape
+    ctx.fillStyle='#2a2a2a';
+    ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.roundRect(-4,-1.5, 8, 5, 3); ctx.fill();
+    ctx.shadowBlur=0;
+    // Nose highlight
+    ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.beginPath(); ctx.ellipse(-1.5,-0.5, 1.5,1,0,0,Math.PI*2); ctx.fill();
+    // Dog mouth — wider W-shape
+    ctx.strokeStyle='rgba(80,40,40,0.55)'; ctx.lineWidth=1.5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(0,3.5); ctx.lineTo(0,6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,6); ctx.quadraticCurveTo(-5,8,-7,7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,6); ctx.quadraticCurveTo(5,8,7,7); ctx.stroke();
+
+    // Panting tongue when moving
+    if(Math.abs(pl.vx)>1 || !pl.onGround) {
+      ctx.fillStyle='#FF7099';
+      ctx.shadowColor='#FF7099'; ctx.shadowBlur=5;
+      ctx.beginPath(); ctx.ellipse(2.5, 9, 3, 4.5, 0.2,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(255,180,200,0.6)';
+      ctx.beginPath(); ctx.ellipse(2.5,10,1.5,2.5,0.2,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+    }
+
+    // Dog spot patches
+    ctx.fillStyle='rgba(30,160,152,0.5)';
+    ctx.beginPath(); ctx.ellipse(-7,6,5,4,0.3,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(8,-4,4,3.5,-0.2,0,Math.PI*2); ctx.fill();
+
+    // Collar — dark brown strap with silver tag
+    ctx.strokeStyle='#6B3A1F'; ctx.lineWidth=4;
+    ctx.shadowColor='rgba(0,0,0,0.4)'; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.arc(0, 2, r-5, 0.08, Math.PI-0.08); ctx.stroke();
+    ctx.shadowBlur=0;
+    // Silver collar studs
+    ctx.fillStyle='#AAAAAA';
+    ctx.beginPath(); ctx.arc(-7, r-9, 2, 0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(7, r-9, 2, 0,Math.PI*2); ctx.fill();
+    // Silver tag
+    ctx.fillStyle='#C8C8C8';
+    ctx.shadowColor='rgba(180,180,180,0.5)'; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.ellipse(0, r-3, 4, 5, 0,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,0.6)';
+    ctx.beginPath(); ctx.ellipse(-1, r-4.5, 1.5,1.2,0,0,Math.PI*2); ctx.fill();
+
+    // Blush cheeks
+    ctx.fillStyle='rgba(80,220,210,0.28)';
+    ctx.beginPath(); ctx.ellipse(-11,3,5,3.5,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(11,3,5,3.5,0,0,Math.PI*2); ctx.fill();
+  }
+  
+  // === EYES (shared, on top) ===
+  const ey = -7;
+  const ev = Math.max(-2.5, Math.min(2.5, pl.vx*0.6));
+  const eh = Math.max(-2, Math.min(2, pl.vy*0.3));
+  
+  if (isBlink) {
+    ctx.strokeStyle='#333'; ctx.lineWidth=2.5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(-9,ey); ctx.lineTo(-5,ey); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(5,ey); ctx.lineTo(9,ey); ctx.stroke();
+  } else {
+    // Whites — slightly larger, rounder for cute look
+    ctx.fillStyle='#fff';
+    ctx.shadowColor='rgba(255,255,255,0.5)'; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.arc(-7,ey,6.5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(7,ey,6.5,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    // Pupils — big & round for kawaii effect
+    ctx.fillStyle='#1a1a1a';
+    ctx.beginPath(); ctx.arc(-7+ev,ey+1+eh,3.5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(7+ev,ey+1+eh,3.5,0,Math.PI*2); ctx.fill();
+    // Iris tint
+    ctx.fillStyle = pl.isP1 ? 'rgba(255,120,0,0.45)' : 'rgba(0,180,160,0.45)';
+    ctx.beginPath(); ctx.arc(-7+ev,ey+1.2+eh,2.2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(7+ev,ey+1.2+eh,2.2,0,Math.PI*2); ctx.fill();
+    // Main shine
+    ctx.fillStyle='rgba(255,255,255,0.9)';
+    ctx.beginPath(); ctx.arc(-8.5+ev,ey-0.5+eh,1.6,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(5.5+ev,ey-0.5+eh,1.6,0,Math.PI*2); ctx.fill();
+    // Secondary sparkle
+    ctx.fillStyle='rgba(255,255,255,0.6)';
+    ctx.beginPath(); ctx.arc(-5.5+ev,ey+2+eh,0.7,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(8.5+ev,ey+2+eh,0.7,0,Math.PI*2); ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function confetti(){
+  for(let i=0;i<40;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div'); el.className='conf';
+      el.textContent=['⭐','🎉','✨','🎊'][Math.floor(Math.random()*4)];
+      el.style.cssText=`left:${Math.random()*100}vw;top:-40px;font-size:${16+Math.random()*20}px;animation-duration:${Math.random()*1+1}s;`;
+      document.body.appendChild(el); setTimeout(()=>el.remove(), 2500);
+    }, i*40);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// BUTTON MAPPING
+// ═══════════════════════════════════════════════
+document.getElementById('btnSt').onclick = () => { curLvl = save.unlocked - 1; showScreen('game'); spawnLvl(); initAudio(); };
+document.getElementById('btnReset').onclick = () => { if(confirm("Reset all progress?")) { save={unlocked:1, stars:{}}; saveProgress(); renderMenu(); } };
+document.getElementById('btnControls').onclick = () => { showScreen('sControls'); };
+document.getElementById('btnLevels').onclick = () => { showScreen('sLevels'); };
+document.getElementById('btnControlsBack').onclick = () => { showScreen('sTitle'); };
+document.getElementById('btnLevelsBack').onclick = () => { showScreen('sTitle'); };
+
+document.getElementById('btnPause').onclick = () => { if(!completing){ paused = true; showScreen('sPause'); } };
+document.getElementById('pdResume').onclick = () => { showScreen('game'); };
+document.getElementById('pdRetry').onclick = () => { showScreen('game'); spawnLvl(); };
+document.getElementById('pdHome').onclick = () => { showScreen('sTitle'); };
+
+document.getElementById('cBtnHome').onclick = () => { showScreen('sTitle'); };
+document.getElementById('cBtnNext').onclick = () => { curLvl++; showScreen('game'); spawnLvl(); };
+
+document.getElementById('wBtnHome').onclick = () => { showScreen('sTitle'); };
+document.getElementById('wBtnPlay').onclick = () => { curLvl=0; showScreen('game'); spawnLvl(); };
+
+// Initialization
+renderMenu();
+
+// Animated star background on title
+function initStarsBg() {
+  const bg = document.getElementById('starsBg');
+  if (!bg) return;
+  bg.innerHTML = '';
+  const colors = ['#FF6B6B','#FFD166','#4ECDC4','#a1c4fd','#ffffff','#FFB347','#C77DFF'];
+  for (let i = 0; i < 38; i++) {
+    const s = document.createElement('div');
+    s.className = 'star-particle';
+    const size = Math.random() * 6 + 2;
+    s.style.cssText = `
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-delay:${Math.random()*3}s;
+      animation-duration:${2+Math.random()*2}s;
+      opacity:${0.3+Math.random()*0.6};
+    `;
+    bg.appendChild(s);
+  }
+}
+initStarsBg();
+
+// ═══════════════════════════════════════════════
+// MAIN LOOP
+// ═══════════════════════════════════════════════
+let lastTime=0;
+function loop(ts) {
+  const dt = (ts - lastTime) || 16;
+  lastTime = ts;
+
+  // Clear single-frame inputs
+  Object.keys(justPressed).forEach(k => justPressed[k] = false);
+
+  if(document.getElementById('gameCanvas').style.display !== 'none') {
+    update(dt);
+    if(p1 && p2) draw();
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
