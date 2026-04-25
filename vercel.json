@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/duo-dash-Test.html"
+      "destination": "/duo-dash.html"
     }
   ]
 }
