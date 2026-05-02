@@ -47,11 +47,6 @@ Game ini dibangun sepenuhnya dalam **satu file HTML** menggunakan vanilla JavaSc
 | **Gerak Kiri** | `A` | `←` |
 | **Gerak Kanan** | `D` | `→` |
 
-| Tombol | Fungsi |
-|---|---|
-| `ESC` | Pause / Resume |
-| `M` | Mute / Unmute audio |
-
 ### Mekanik Khusus
 
 **Boost Jump** — Diam di tempat, biarkan partner melompat ke atasmu, lalu lompat lagi — partner akan melesat ke atas! Digunakan untuk mencapai platform yang terlalu tinggi untuk lompatan biasa.
