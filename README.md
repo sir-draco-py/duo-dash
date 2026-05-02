@@ -487,8 +487,10 @@ ORDER BY total_points DESC;
 
 ```
 duo-dash-destiny/
-├── duo-dash-destiny.html    # Seluruh game dalam satu file
-└── README.md                # Dokumentasi ini
+├── duo-dash-stable.html    # Seluruh game dalam satu file
+├── duo-dash-v01...         # Versi versi sebelumnya
+├── vercel.json             # Koneksi ke Vercel
+└── README.md               # Dokumentasi ini
 ```
 
 Karena game dibangun dalam satu file, tidak ada build process, dependency management, atau konfigurasi tambahan yang diperlukan selain mengisi Supabase credentials.
@@ -509,7 +511,7 @@ MIT License — bebas digunakan, dimodifikasi, dan didistribusikan.
 
 <div align="center">
 
-**Dibuat dengan ❤️ menggunakan Vanilla JavaScript & HTML5 Canvas**
+**Dibuat dengan passion oleh Faizal Kurniawan**
 
 *"Two players. One destiny."*
 
