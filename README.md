@@ -47,6 +47,11 @@ Game ini dibangun sepenuhnya dalam **satu file HTML** menggunakan vanilla JavaSc
 | **Gerak Kiri** | `A` | `←` |
 | **Gerak Kanan** | `D` | `→` |
 
+| Tombol | Fungsi |
+|---|---|
+| `ESC` | Pause / Resume game |
+| `M` | Mute / Unmute audio |
+
 ### Mekanik Khusus
 
 **Boost Jump** — Diam di tempat, biarkan partner melompat ke atasmu, lalu lompat lagi — partner akan melesat ke atas! Digunakan untuk mencapai platform yang terlalu tinggi untuk lompatan biasa.
@@ -75,8 +80,8 @@ Sistem akun berbasis Tim — karena game ini dimainkan berpasangan. Tersedia mod
 ### 🎭 Character Selection
 Sebelum setiap sesi, kedua pemain memilih karakter masing-masing dari 6 pilihan. Setiap karakter memiliki skin yang digambar dari scratch di canvas dengan anatomi unik.
 
-### 💾 Per-Account Progress
-Progress unlock level dan best score tersimpan secara terpisah per akun — tidak bocor antar akun atau ke mode Guest.
+### 💾 Per-Account Progress (Online Sync)
+Progress unlock level, stars, poin, dan best time tersimpan per akun di **Supabase** — bukan hanya localStorage. Login dari device manapun, progress tetap ada. Mode Guest tetap menggunakan localStorage lokal. localStorage juga digunakan sebagai cache offline untuk resilience saat koneksi bermasalah.
 
 ---
 
@@ -205,11 +210,14 @@ Setiap skin digambar dari scratch menggunakan **Canvas 2D API** — bukan sekada
 - Tidak ada password plaintext yang tersimpan di database
 - Session tersimpan di `localStorage` dan otomatis di-restore saat halaman dibuka kembali
 
-### Progress Isolation
-- Setiap akun tim memiliki progress tersendiri (`localStorage` key: `duoDash_team_{uuid}`)
-- Mode Guest memiliki progress terpisah (`duoDash_guest`)
+### Progress Sync & Isolation
+- Progress tiap akun tim disimpan di Supabase tabel `team_progress` — tersedia di semua device
+- localStorage digunakan sebagai **cache lokal** untuk performa dan offline resilience
+- Saat login: progress di-fetch dari Supabase, lalu di-cache ke localStorage
+- Saat level selesai: localStorage diupdate langsung (optimistic), lalu sync ke Supabase di background
+- Mode Guest: localStorage only — tidak pernah menyentuh Supabase
 - Logout otomatis mereset tampilan ke progress Guest
-- Login ke akun lain otomatis memuat progress akun tersebut
+- Progress antar akun sepenuhnya terisolasi — tidak bisa bocor satu sama lain
 
 ---
 
@@ -224,7 +232,7 @@ Setiap skin digambar dari scratch menggunakan **Canvas 2D API** — bukan sekada
 | **Styling** | CSS3 — tanpa framework |
 | **Backend / DB** | Supabase (PostgreSQL + REST API) |
 | **Authentication** | Custom + Web Crypto API (SHA-256) |
-| **Storage** | localStorage — progress & session |
+| **Storage** | Supabase (progress online) + localStorage (cache & guest) |
 | **Deployment** | Single HTML file — portable, no build step |
 
 ### Arsitektur
@@ -243,21 +251,24 @@ duo-dash-destiny.html
     │   ├── Player       Class dengan physics, collision, rendering
     │   ├── buildSolids  Mengumpulkan semua solid objects per frame
     │   ├── resolveVsSolids  AABB collision vs platforms/gates/walls
-    │   ├── resolveVsPartner Collision & push antar player
+    │   ├── resolveVsPartner Collision & push antar player (wall-aware)
     │   ├── drawPlayer   Per-character canvas rendering
     │   └── Particle System  Efek visual lightweight
     ├── Scoring System
     │   ├── calcPoints   Formula Base + Speed - Fall
-    │   ├── Timer        Pause-aware live timer
-    │   └── saveProgress Per-account localStorage
+    │   ├── Timer        Pause-aware live timer (ESC to pause/resume)
+    │   └── saveProgress Async — localStorage cache + Supabase sync
     ├── Auth System
     │   ├── hashPassword Web Crypto SHA-256
     │   ├── handleAuth   Register / Login flow
+    │   ├── loadProgress Async — fetch Supabase, fallback localStorage
     │   └── updateAuthUI Badge state management
     └── Supabase Integration
-        ├── sbFetch      REST API wrapper
-        ├── submitScore  POST ke level_scores
-        └── loadLeaderboard Fetch & render per mode
+        ├── sbFetch          REST API wrapper
+        ├── submitScore      POST ke level_scores (leaderboard)
+        ├── saveProgress     PATCH/POST ke team_progress
+        ├── loadProgress     GET dari team_progress
+        └── loadLeaderboard  Fetch & render per mode
 ```
 
 ---
@@ -391,7 +402,7 @@ CREATE TABLE teams (
   created_at timestamptz DEFAULT now()
 );
 
--- Tabel scores per level
+-- Tabel scores per level (leaderboard)
 CREATE TABLE level_scores (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   team_id uuid REFERENCES teams(id) ON DELETE CASCADE,
@@ -403,6 +414,18 @@ CREATE TABLE level_scores (
   played_at timestamptz DEFAULT now()
 );
 
+-- Tabel progress per akun (online sync)
+CREATE TABLE team_progress (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  team_id uuid REFERENCES teams(id) ON DELETE CASCADE UNIQUE,
+  unlocked int DEFAULT 1,
+  stars jsonb DEFAULT '{}',
+  points jsonb DEFAULT '{}',
+  best_time jsonb DEFAULT '{}',
+  total_fails int DEFAULT 0,
+  updated_at timestamptz DEFAULT now()
+);
+
 -- Index untuk query leaderboard
 CREATE INDEX ON level_scores(level_number, points DESC);
 CREATE INDEX ON level_scores(team_id);
@@ -410,11 +433,15 @@ CREATE INDEX ON level_scores(team_id);
 -- Row Level Security
 ALTER TABLE teams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE level_scores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE team_progress ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Public read scores" ON level_scores FOR SELECT USING (true);
-CREATE POLICY "Public read teams"  ON teams        FOR SELECT USING (true);
-CREATE POLICY "Insert scores"      ON level_scores FOR INSERT WITH CHECK (true);
-CREATE POLICY "Insert teams"       ON teams        FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public read scores"    ON level_scores   FOR SELECT USING (true);
+CREATE POLICY "Public read teams"     ON teams          FOR SELECT USING (true);
+CREATE POLICY "Public read progress"  ON team_progress  FOR SELECT USING (true);
+CREATE POLICY "Insert scores"         ON level_scores   FOR INSERT WITH CHECK (true);
+CREATE POLICY "Insert teams"          ON teams          FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public insert progress" ON team_progress FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public update progress" ON team_progress FOR UPDATE USING (true);
 ```
 
 **4. Konfigurasi Credentials**
@@ -455,6 +482,16 @@ level_scores
 ├── falls         int
 ├── stars         int  (1–3)
 └── played_at     timestamptz
+
+team_progress
+├── id            uuid PRIMARY KEY
+├── team_id       uuid → teams.id  (UNIQUE)
+├── unlocked      int  (level tertinggi yang terbuka)
+├── stars         jsonb  { "1": 3, "2": 2, ... }
+├── points        jsonb  { "1": 1400, "2": 950, ... }
+├── best_time     jsonb  { "1": 18500, "2": 34200, ... } (ms)
+├── total_fails   int
+└── updated_at    timestamptz
 ```
 
 ### Query Leaderboard
